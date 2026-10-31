@@ -36,7 +36,7 @@ Severity weighs how often it happens, how much it hurts when it does, and whethe
 
 ## A · Accessibility floor (WCAG 2.2 AA): never broken
 
-WCAG 2.2 (W3C Recommendation, 2023) is the legal and technical baseline (EN 301 549 in the EU). Level 2, and a hard
+WCAG 2.2, a W3C Recommendation, W3C (2023), is the legal and technical baseline (EN 301 549 in the EU). Level 2, and a hard
 floor: no other rule outweighs it.
 
 | ID | Rule | Source | How to check here |

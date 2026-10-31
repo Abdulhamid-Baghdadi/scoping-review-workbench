@@ -1,0 +1,5 @@
+# What the design rules' citation check skips here (check_citations.py in the web-app-design skill).
+# Names of reporting guidelines that look like an author before a year, such as PRISMA 2020:
+PRISMA
+# The video's demo copy of a review: the papers' own references, research data, not this app's citations:
+video-media/out/

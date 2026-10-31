@@ -21,7 +21,7 @@ reviewer, full texts, Obsidian notes) stays shared.
 
 | | Scoping (current) | Systematic (new) |
 |---|---|---|
-| Reporting guideline | PRISMA-ScR (Tricco 2018), 20 + 2 optional items | PRISMA 2020 (Page 2021), 27 items, 42 with sub-items |
+| Reporting guideline | PRISMA-ScR (Tricco et al. 2018), 20 + 2 optional items | PRISMA 2020 (Page et al. 2021), 27 items, 42 with sub-items |
 | Conduct guidance | JBI Manual (Peters et al.), Arksey & O'Malley, Levac | Cochrane Handbook, JBI Manual (systematic reviews) |
 | Question framework | PCC (Population, Concept, Context) | PICO (Population, Intervention, Comparator, Outcome) or a variant (PECO, SPIDER) |
 | Registration | Optional (OSF) | Strongly recommended (PROSPERO for health, OSF otherwise) |
