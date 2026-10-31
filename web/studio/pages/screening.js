@@ -75,6 +75,7 @@ async function decide(decision, reason = "") {
   announce(`${rec.record_id} ${DONE[decision]}${reason ? ", " + reason : ""}${ai ? (kept ? ", as Claude suggested" : ", not as Claude suggested") : ""}. Z to undo.`);
   SC.excl = false;
   if (SC.filter === "todo" || SC.filter === "suggest") SC.id = next ? next.record_id : null;
+  SC.fresh = { moved: SC.id !== rec.record_id };
   render();
 }
 
@@ -115,6 +116,8 @@ function decisionHistory(id) {
 }
 
 PAGES.screening = () => {
+  const fresh = SC.fresh;                                 // a decision just made: shown once, not on later redraws
+  SC.fresh = null;
   const q = queue();
   if (!q.find(r => r.record_id === SC.id)) SC.id = q[0]?.record_id || null;
   const rec = S.records.find(r => r.record_id === SC.id);
@@ -140,20 +143,23 @@ PAGES.screening = () => {
     main = h("div", { class: "card empty" }, h("div", { class: "big" }, total ? "🎉" : "📭"),
       h("h2", {}, SC.filter === "suggest" ? "All of Claude's suggestions are reviewed" : total ? "Nothing left to screen here" : "No records yet"),
       h("p", {}, total ? "Switch to 'All' to review earlier decisions, or continue with the next step." : "Import a database export first (step Search & import)."),
-      lastDecisionLine());
+      lastDecisionLine(fresh));
   } else {
     const absBox = h("div", { class: "abstract" }, h("span", { class: "muted" }, "Loading abstract…"));
     const showAbs = r => absBox.innerHTML = r.abstract ? highlight(r.abstract) : `<span class="muted">No abstract in the export. Open the DOI to read it.</span>`;
     if (SC.cache[rec.record_id]) showAbs(SC.cache[rec.record_id]);
     else api("record_abstract", { record_id: rec.record_id }, { silent: true }).then(j => { SC.cache[rec.record_id] = j.record; if (SC.id === rec.record_id) showAbs(j.record); });
     const cur = rec[dkey];
-    const reasonRow = h("div", { class: "reasons", style: SC.excl || cur === "exclude" ? "" : "display:none" },
+    // "choosing": Exclude was just pressed; on a phone only then is the list shown (the stamp shows the reason given)
+    const reasonRow = h("div", { class: "reasons" + (SC.excl ? " choosing" : ""), style: SC.excl || cur === "exclude" ? "" : "display:none" },
       h("span", { class: "small muted", style: "align-self:center" }, "Reason:"),
       reasons.map((r, i) => h("button", { class: rec[rkey] && r.split(" ")[0] === rec[rkey].split(" ")[0] ? "on" : "", onclick: () => decide("exclude", r.split(" ")[0]) }, h("kbd", {}, i + 1), " ", r)));
     const notes = h("input", { type: "text", placeholder: "e.g. other version of R0012", value: rec.notes || "",
       onchange: e => api("set_record", { record_id: rec.record_id, fields: { notes: e.target.value } }, { render: false, silent: true }) });
-    main = h("div", { class: "card rec" },
-      h("div", { class: "meta" }, h("b", { style: "font-family:var(--mono)" }, rec.record_id), rec.year ? pill(rec.year) : null, rec.journal ? h("span", {}, rec.journal) : null,
+    // the record as a card in the Select colour; after a decision the next one slides in
+    main = h("div", { class: "card rec phase-select" + (fresh?.moved ? " deal" : "") },
+      h("div", { class: "meta" }, h("b", { class: "rid" }, rec.record_id),
+        rec.year || rec.journal ? h("span", { class: "typeline" }, [rec.year, rec.journal].filter(Boolean).join(" · ")) : null,
         rec.language && !/^english$/i.test(rec.language) ? pill("language: " + rec.language, "bad") : null,
         rec.publication ? pill("in your library", "accent") : null,
         cur && cur !== "pending" ? pill("decided: " + cur + (rec[rkey] ? " · " + rec[rkey] : ""), decKind(cur)) : null,
@@ -171,7 +177,7 @@ PAGES.screening = () => {
       SC.filter === "suggest" && rec[aiKey("decision")] ? suggestionBox(rec) : null,
       h("div", { style: "margin-top:12px" }, field("Note (optional)", notes)),
       decisionHistory(rec.record_id),
-      decisionBar(rec, cur, reasonRow));
+      decisionBar(rec, cur, reasonRow, fresh));
   }
 
   // the queue lists at most 400 records: those around the current one, so it is always in view
@@ -201,25 +207,29 @@ PAGES.screening = () => {
  * The decision buttons, kept in view at the foot of the window while the abstract is read (sticky), so a decision
  * never needs a scroll first (Fitts). Above them: the last decision with its Undo, and Previous / Next.
  */
-/** The last decision with its Undo button (also shown when the queue has just been emptied). */
-function lastDecisionLine() {
+/**
+ * The last decision with its Undo button (also shown when the queue has just been emptied): a stamp with the word,
+ * in the decision's colour, that lands once when the decision is made (`fresh`).
+ */
+function lastDecisionLine(fresh) {
   const last = lastDecision();
-  return last ? h("span", { class: "last-decision" }, decDot(last.decision), h("span", {}, h("b", {}, last.id), ` ${DONE[last.decision]}${last.reason ? " · " + last.reason : ""}`),
+  return last ? h("span", { class: `last-decision dec-${last.decision || "pending"}${fresh ? " fresh" : ""}` }, decDot(last.decision),
+    h("span", {}, h("b", {}, last.id), " ", h("span", { class: "stamp-word" }, `${DONE[last.decision]}${last.reason ? " · " + last.reason : ""}`)),
     btn(["↶ Undo ", h("kbd", {}, "Z")], undo, "sm ghost", `Put back the decision ${last.id} had before`)) : null;
 }
 
-function decisionBar(rec, cur, reasonRow) {
+function decisionBar(rec, cur, reasonRow, fresh) {
   const pressed = d => ({ "aria-pressed": String(cur === d) });
   return h("div", { class: "decide-bar" },
     h("div", { class: "decide-top" },
-      lastDecisionLine() ?? h("span", { class: "kbdhint" }, `${SC.filter === "suggest" ? "Enter accept · " : ""}I include · ${SC.stage === "ta" ? "U unsure · " : ""}E exclude, then 1–9 reason · Z undo · ←/→ previous / next`),
+      lastDecisionLine(fresh) ?? h("span", { class: "kbdhint" }, `${SC.filter === "suggest" ? "Enter accept · " : ""}I include · ${SC.stage === "ta" ? "U unsure · " : ""}E exclude, then 1–9 reason · Z undo · ←/→ previous / next`),
       h("span", { class: "spacer" }),
       btn("← Previous", () => move(-1), "sm ghost", "Previous record (←)"), btn("Next →", () => move(1), "sm ghost", "Next record (→)")),
     h("div", { class: "decide" },
       h("button", { class: "inc" + (cur === "include" ? " on" : ""), ...pressed("include"), onclick: () => decide("include") }, "✓ Include", h("kbd", {}, "I")),
       SC.stage === "ta" ? h("button", { class: "uns" + (cur === "unsure" ? " on" : ""), ...pressed("unsure"), onclick: () => decide("unsure") }, "? Unsure", h("kbd", {}, "U"))
         : h("button", { class: "uns", onclick: () => api("mark_pdf", { record_id: rec.record_id, status: "not-retrieved" }) }, "⊘ Not retrieved"),
-      h("button", { class: "exc" + (cur === "exclude" ? " on" : ""), ...pressed("exclude"), onclick: () => { SC.excl = true; reasonRow.style.display = ""; } }, "✕ Exclude", h("kbd", {}, "E"))),
+      h("button", { class: "exc" + (cur === "exclude" ? " on" : ""), ...pressed("exclude"), onclick: () => { SC.excl = true; reasonRow.style.display = ""; reasonRow.classList.add("choosing"); } }, "✕ Exclude", h("kbd", {}, "E"))),
     reasonRow);
 }
 

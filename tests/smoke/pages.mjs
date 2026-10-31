@@ -88,6 +88,11 @@ try {
   const before = await decided();
   await page.keyboard.press("e"); await page.keyboard.press("1"); await page.waitForTimeout(500);   // exclude with the first reason
   actions.screening = before !== await decided();
+  // the decision's stamp: its word under the record, landing once; a later redraw (here: moving on) shows it still, without landing again
+  const stamp = () => page.evaluate(() => { const s = document.querySelector(".last-decision"); return s ? `${s.classList.contains("fresh") ? "fresh" : "still"} ${s.querySelector(".stamp-word")?.textContent}` : ""; });
+  const landed = await stamp();
+  await page.keyboard.press("ArrowRight"); await page.waitForTimeout(200);
+  actions.stamp = /^fresh excluded · E/.test(landed) && /^still excluded · E/.test(await stamp());
   // three keys typed with no pause: three decisions on three records, none landing on (and overwriting) the same one
   const pendingIds = () => page.evaluate(async () => (await window.backend.get("/api/state")).records.filter(r => r.ta_decision === "pending").map(r => r.record_id));
   await page.evaluate(async () => {           // the finished example has no open records: reopen three, then show the To do queue
