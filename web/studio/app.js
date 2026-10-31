@@ -29,6 +29,7 @@ import { render, renderChrome } from "./shell/chrome.js";
 import { openFinishedExample } from "./shell/reviews.js";
 import { offerTour } from "./shell/tour.js";
 import { confirmBox, promptText, toast } from "./ui/dialogs.js";
+import { icon } from "./ui/components.js";
 
 Object.assign(view, { render, renderChrome, toast, promptText });   // what core/api.js needs from the page
 
@@ -53,7 +54,7 @@ window.studioReady = (async function start() {
     if (wantExample) await openFinishedExample();
     else if (!store.get("toured", "") && CUR !== HOME) offerTour();   // the Homepage has its own tour button
   } catch (e) {
-    $("#page").replaceChildren(h("div", { class: "card empty" }, h("div", { class: "big" }, "⚠️"), h("h2", {}, "Could not load the review"), h("p", {}, e.message)));
+    $("#page").replaceChildren(h("div", { class: "card empty" }, h("div", { class: "big" }, icon("warning")), h("h2", {}, "Could not load the review"), h("p", {}, e.message)));
   }
 })();
 

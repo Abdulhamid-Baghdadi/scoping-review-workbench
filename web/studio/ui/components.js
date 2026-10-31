@@ -6,6 +6,10 @@ import { api, upload } from "../core/api.js";
 import { esc, h } from "../core/dom.js";
 import { S } from "../core/state.js";
 import { toast } from "./dialogs.js";
+import { iconSvg } from "../../art/icons.js";
+
+/** One of our drawn icons (web/art/icons.js) as an <svg> element, to stand beside a word: [icon("pdf"), "Open PDF"]. */
+export const icon = name => h("span", { html: iconSvg(name) }).firstElementChild;
 
 /** The library folder chosen in Settings (e.g. "00 - Library"). */
 export const libraryName = () => S.library_name || "your library folder";

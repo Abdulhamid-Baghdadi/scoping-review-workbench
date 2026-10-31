@@ -1,7 +1,12 @@
 # Visual refresh: plan
 
 Status: steps 1–3 (fonts, tokens, type) 4 (journey map and page header), 5 (screening), 6 (pictures and icons) and 7 (Homepage) done on 31 October 2026, screenshots in
-[visual-refresh/after-steps-1-3/](visual-refresh/after-steps-1-3/); steps 8–10 still to do. The Homepage's card fan
+[visual-refresh/after-steps-1-3/](visual-refresh/after-steps-1-3/); step 8 (phone toolbar) skipped, since the Workbench is not expected to be used on a phone (the page still reflows to
+320 px, WCAG 1.4.10, which the smoke test checks); step 9 (other pages) done: every step page's cards carry its
+phase colour, the PCC cards three tints of Plan, the flow diagram Find, Select and Include, and drawn icons replace
+the emoji in the pages (the smoke test now fails on an emoji in a page's text). Left out of step 9 on purpose:
+database names and charting field names in capitals (long names read worse in capitals) and the charting paper list
+as cards. Step 10 still to do. The Homepage's card fan
 shows three of the review's own decided records (none are made up); before there are any, it shows the picture of the
 phase the review is in. Its phase cards are titled "Your review, phase by phase", since the walk-through below keeps
 "How a review goes". Step 6 drew the five

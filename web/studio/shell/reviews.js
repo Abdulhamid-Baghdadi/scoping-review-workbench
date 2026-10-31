@@ -7,7 +7,7 @@ import { flushSaves, SAVE_STATE } from "../core/autosave.js";
 import { $, h, store } from "../core/dom.js";
 import { CUR, D, HOME, S, SC, setCur, setReview, setS } from "../core/state.js";
 import { go } from "./navigation.js";
-import { btn } from "../ui/components.js";
+import { btn, icon } from "../ui/components.js";
 import { confirmBox, modal, promptText, toast } from "../ui/dialogs.js";
 
 export async function openFinishedExample() {
@@ -27,8 +27,8 @@ export function renderDraftBar() {
   bar.hidden = false;
   bar.classList.toggle("example", Boolean(backend.entry?.example));
   bar.replaceChildren(...[                                           // (replaceChildren would print an empty item as "null")
-    backend.entry?.example ? h("span", { class: "example-badge", title: `Design for disassembly of battery packs: a real OpenAlex search (${S.flow.unique} records) screened down to ${S.flow.included} papers, read in full and charted. The openly licensed full texts come with it. Try anything: it is reset each time the example is opened.` }, "📘 Example · not kept") : null,
-    backend.entry?.example ? btn("💾 Save a copy…", e => busy(e.currentTarget, saveExampleCopy), "sm ghost", "Copy the whole example review (notes and PDFs) into a folder on your PC, e.g. to open it in Obsidian") : null,
+    backend.entry?.example ? h("span", { class: "example-badge", title: `Design for disassembly of battery packs: a real OpenAlex search (${S.flow.unique} records) screened down to ${S.flow.included} papers, read in full and charted. The openly licensed full texts come with it. Try anything: it is reset each time the example is opened.` }, icon("example"), "Example · not kept") : null,
+    backend.entry?.example ? btn([icon("save"), "Save a copy…"], e => busy(e.currentTarget, saveExampleCopy), "sm ghost", "Copy the whole example review (notes and PDFs) into a folder on your PC, e.g. to open it in Obsidian") : null,
     // filled on the steps, plain on the Homepage, whose Continue button is that page's one primary action
     backend.entry?.example ? btn("← My review", () => switchReview(S.reviews[0]), CUR === HOME ? "sm" : "sm primary", "Back to your own review") : null,
     // after a reload the app starts in the draft: one click back to the review in a folder (the click also lets the
@@ -36,7 +36,7 @@ export function renderDraftBar() {
     backend.entry?.draft && lastFolder() ? btn(`↩ Back to ${lastFolder().replace(/ records$/, "")}`, () => switchReview(lastFolder()), CUR === HOME ? "sm" : "sm primary", "Open your review again: after a reload the app starts in the draft") : null,
     // a draft with work in it: say where it lives, and how to keep it (a browser can clear its own storage)
     backend.entry?.draft && (S.events.length || S.records.length) ? h("span", { class: "small muted" }, "This draft is only in this browser.") : null,
-    backend.entry?.draft && (S.events.length || S.records.length) ? btn("💾 Save to a folder…", saveDraft, "sm", "Save the review as a folder of notes on your PC (it can then open in Obsidian too); a browser can clear its own storage") : null,
+    backend.entry?.draft && (S.events.length || S.records.length) ? btn([icon("save"), "Save to a folder…"], saveDraft, "sm", "Save the review as a folder of notes on your PC (it can then open in Obsidian too); a browser can clear its own storage") : null,
     h("span", { id: "saveState", class: "save-state " + SAVE_STATE[0], title: "Everything you type is saved by itself" }, SAVE_STATE[1])].filter(Boolean));
 }
 

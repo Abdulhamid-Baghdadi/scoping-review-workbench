@@ -5,7 +5,7 @@
 import { $, h, singleKeys } from "../core/dom.js";
 import { H, HOME, S, SC } from "../core/state.js";
 import { afterGo, go, stage, stageName, stepOf } from "./navigation.js";
-import { btn, copy, hlQuery, iconBtn, openNote, pill } from "../ui/components.js";
+import { btn, copy, hlQuery, icon, iconBtn, openNote, pill } from "../ui/components.js";
 import { modal, restoreFocus } from "../ui/dialogs.js";
 
 function refList(numbering) {
@@ -39,7 +39,7 @@ export function openHelp(key) {
     h("p", { class: "lead" }, x.what),
     h("ol", { class: "steps" }, x.how.map(l => h("li", {}, l))),
     h("h3", {}, "Rule or choice?"), rules,
-    h("div", { class: "row", style: "margin-top:14px" }, btn("💡 Show example", () => openExample(key), "sm")),
+    h("div", { class: "row", style: "margin-top:14px" }, btn([icon("idea"), "Show example"], () => openExample(key), "sm")),
     h("details", { class: "fold" }, h("summary", {}, `Terms (${terms.length})`), terms),
     h("details", { class: "fold" }, h("summary", {}, "What the labels mean"),
       Object.keys(H.levels).map(k => h("div", { class: "rule" }, lvl(k), h("div", { class: "small muted" }, H.levels[k].explain)))),
@@ -101,7 +101,7 @@ export function openClaudeGuide() {
       h("div", { class: "row", style: "margin-bottom:6px" },
         h("b", {}, key === "fulltext" ? `${stepOf("screening").title} · Full texts` : key === "screening" ? `${stepOf(key).title} · Titles & abstracts` : stepOf(key).tabs.length > 1 ? `${stepOf(key).title} · ${stageName(key)}` : stepOf(key).title), pill(mode === "off" ? "off for this review" : "on: " + step.modes.find(m => m.key === mode).label, mode === "off" ? "" : "ok"),
         h("span", { style: "flex:1" }), btn("Open", () => goStage(key), "sm ghost"),
-        mode === "off" ? null : btn("📋 Copy prompt", () => copy(step.prompt), "sm")),
+        mode === "off" ? null : btn([icon("copy"), "Copy prompt"], () => copy(step.prompt), "sm")),
       h("div", { class: "small" }, ul(step.modes.filter(m => m.key !== "off").map(m => [h("b", {}, m.label + ": "), m.desc]))),
       h("div", { class: "small", style: "margin-top:6px" }, h("b", {}, "You check: "), ul(step.checks)),
       h("div", { class: "small muted", style: "margin-top:6px" }, step.skills.length > 1 ? "AI skills: " : "AI skill: ", step.skills.map((n, i) => [i ? ", " : "", h("code", {}, `skills/${n}/SKILL.md`)])));
@@ -116,8 +116,8 @@ export function openClaudeGuide() {
       "Keep Scoping Review Workbench open next to it: Claude writes, Scoping Review Workbench is where you check and confirm.",
       "For paywalled papers: let Claude use a browser where you are signed in to your library (for example Claude in Chrome), only if you agree to that."])),
     sec("2 · How one step works", ol([
-      "Open the step and choose a mode on its 🤖 AI assistance card. The choice is part of your method: after the protocol is locked it is an amendment.",
-      "Press 📋 Copy prompt and paste it into Claude Code.",
+      "Open the step and choose a mode on its AI assistance card. The choice is part of your method: after the protocol is locked it is an amendment.",
+      "Press Copy prompt and paste it into Claude Code.",
       ["Claude follows the skill: it reads what it needs and writes its suggestions through ", h("code", {}, "bin/ai-assist.js"), ", which refuses when the mode is off and never sets a final decision. If two folders share the review's name (a review and its test copy), Claude asks you which one."],
       "Back in Scoping Review Workbench, review the suggestions (Suggested queue, 'checked by AI' papers) and confirm or change each one.",
       "Work through the 'You check' list for that step."])),
@@ -165,7 +165,7 @@ export function openKeys() {
   const always = [["Alt+↑ / Alt+↓", "previous / next page"], ["← / →", "previous / next record (screening)"], ["Enter", "accept Claude's suggestion (Suggested queue)"], ["Esc", "close panel"]];
   const row = ([k, d], off) => h("tr", { style: off ? "opacity:.55" : "" }, h("td", {}, h("kbd", {}, k)), h("td", {}, d, off ? " (switched off)" : ""));
   modal({ title: "Keyboard shortcuts", body: h("div", {},
-    h("p", { class: "small muted", style: "margin-top:0" }, `Single-key shortcuts (letters and digits) are ${singleKeys.on() ? "on" : "off"}. Switch them in ⚙ Settings → Single-key shortcuts.`),
+    h("p", { class: "small muted", style: "margin-top:0" }, `Single-key shortcuts (letters and digits) are ${singleKeys.on() ? "on" : "off"}. Switch them in Settings → Single-key shortcuts.`),
     h("table", { class: "tbl" }, letters.map(r => row(r, !singleKeys.on())), always.map(r => row(r, false)))) });
 }
 

@@ -20,18 +20,19 @@ PAGES.questions = () => {
     ...(n => [n, labelBy(h("input", { type: "text", value: s, placeholder: exampleFor("questions", "Sub-questions", i), oninput: e => d.sub[i] = e.target.value }), [subsTitle, n])])(h("span", { class: "muted", style: "width:22px" }, `${i + 1}.`)),
     iconBtn("✕", `Remove sub-question ${i + 1}`, () => { d.sub.splice(i, 1); drawSubs(); saver.schedule(); }))), btn("+ Add sub-question", () => { d.sub.push(""); drawSubs(); subs.querySelectorAll("input")[d.sub.length - 1]?.focus(); }, "sm"));
   drawSubs();
-  const pcc = (k, label, hint, color) => {
+  // each part of the question in its own tint of the Plan colour (the card's top edge); its title says which part
+  const pcc = (k, label, hint, share) => {
     const title = h("h2", {}, label), sub = h("p", { class: "sub" }, hint);   // the card's title is the field's label
-    return h("div", { class: "card", style: `border-top:3px solid ${color};margin:0` }, title, sub,
+    return h("div", { class: "card", style: `--phase:color-mix(in srgb, var(--plan) ${share}%, var(--surface));margin:0` }, title, sub,
       labelBy(autosize(h("textarea", { rows: 2, value: d[k], placeholder: exampleFor("questions", label), oninput: bind(k) })), title, sub));
   };
   const hints = { population: "What is studied? (products, systems, people…)", concept: "The core phenomenon, method or intervention", context: "Setting, domain, period, publication types" };
   return saver.watch(h("div", {},
     h("div", { class: Q.outcome ? "grid4" : "grid3", style: "margin-bottom:16px" },
-      pcc("population", Q.population, hints.population, "#4f46e5"),
-      pcc("concept", Q.concept, hints.concept, "#0891b2"),
-      pcc("context", Q.context, hints.context, "#16a34a"),
-      Q.outcome ? pcc("outcome", Q.outcome, hints.outcome, "#d97706") : null),
+      pcc("population", Q.population, hints.population, 100),
+      pcc("concept", Q.concept, hints.concept, 70),
+      pcc("context", Q.context, hints.context, 45),
+      Q.outcome ? pcc("outcome", Q.outcome, hints.outcome, 30) : null),
     card("Review questions", null,
       field("Main question", autosize(h("textarea", { rows: 2, value: d.main, placeholder: exampleFor("questions", "Main question"), oninput: bind("main") }))),
       h("div", { style: "margin-top:12px" }, subsTitle, subs),

@@ -10,7 +10,7 @@ import { openHelp } from "./help.js";
 import { flowMap, phaseClass } from "./journey-map.js";
 import { curTab, go, goTab, pageIndex, pageSequence, sectioned, sectionId, skipStage, stage, stepOf, stepStatus } from "./navigation.js";
 import { openReviewFolder, renderDraftBar, saveDraft, switchReview } from "./reviews.js";
-import { btn, copy, iconBtn, libraryName, openNote, pill, segmented, statusKind } from "../ui/components.js";
+import { btn, copy, icon, iconBtn, libraryName, openNote, pill, segmented, statusKind } from "../ui/components.js";
 import { confirmBox, toast } from "../ui/dialogs.js";
 import { aiStrip } from "../ui/ai-strip.js";
 
@@ -20,18 +20,19 @@ const reviewLabel = r => r.startsWith("📘") ? "Example review" : r === S.revie
 /** The review button in the top bar: the review's name; its menu switches review, opens a folder or saves the draft. */
 function renderPicker() {
   const b = $("#btnReview"), menu = $("#reviewMenu");
-  const icon = backend.entry?.example ? "📘" : backend.entry?.draft ? "📝" : "📁";
-  b.replaceChildren(h("span", { class: "rb-icon", "aria-hidden": "true" }, icon), h("span", { class: "rb-name" }, reviewLabel(REVIEW)), h("span", { class: "rb-caret", "aria-hidden": "true" }, "▾"));
+  // the kind of review as a drawn icon ("📘" stays only as the example's name in the list of reviews, which is data)
+  const kind = r => icon(r.startsWith("📘") ? "example" : r === S.reviews[0] ? "note" : "folder");
+  b.replaceChildren(h("span", { class: "rb-icon", "aria-hidden": "true" }, kind(REVIEW)), h("span", { class: "rb-name" }, reviewLabel(REVIEW)), h("span", { class: "rb-caret", "aria-hidden": "true" }, "▾"));
   b.title = /[\\/]/.test(REVIEW) ? `${REVIEW} — switch review, open a folder, save` : "Your reviews: switch, open a folder, save";
   const folder = r => r !== S.reviews[0] && !r.startsWith("📘");      // a review folder on the PC (not the draft or the example)
   const pick = r => h("button", { class: "btn ghost" + (r === REVIEW ? " current" : ""), onclick: () => r !== REVIEW && switchReview(r) },
-    h("span", { class: "rm-check" }, r === REVIEW ? "✓" : ""), r.startsWith("📘") ? "📘 " : r === S.reviews[0] ? "📝 " : "📁 ", reviewLabel(r),
+    h("span", { class: "rm-check" }, r === REVIEW ? "✓" : ""), kind(r), reviewLabel(r),
     r === S.reviews[0] ? h("span", { class: "rm-note" }, "in this browser") : r.startsWith("📘") ? h("span", { class: "rm-note" }, "finished, not kept") : null);
   const item = r => folder(r) ? h("div", { class: "rm-row" }, pick(r),
     iconBtn("✕", `Remove ${reviewLabel(r)} from this list (its folder stays on your PC)`, () => forgetFromList(r), "sm")) : pick(r);
   menu.replaceChildren(h("div", { class: "rm-head" }, "Your reviews"), ...S.reviews.map(item), h("div", { class: "rm-line" }),
-    backend.entry?.draft ? btn("💾 Save my review to a folder…", e => busy(e.currentTarget, saveDraft), "ghost") : null,
-    btn("📂 Open a review folder…", openReviewFolder, "ghost"));
+    backend.entry?.draft ? btn([icon("save"), "Save my review to a folder…"], e => busy(e.currentTarget, saveDraft), "ghost") : null,
+    btn([icon("folder"), "Open a review folder…"], openReviewFolder, "ghost"));
 }
 
 /** Takes a review folder off the list of reviews (the folder itself stays on the PC); leaving it if it is open. */
@@ -89,7 +90,7 @@ function sectionOf(t, i, tabs) {
       h("h2", { id: sectionId(t) + "-h" }, t.label),
       last ? pill(s.status.replace("-", " "), statusKind(s.status)) : null,
       s.optional ? pill("optional", "info") : null,
-      locked ? h("span", { class: "pill warn", title: "The protocol is locked: changes here are amendments, with a reason" }, "🔒 locked") : null,
+      locked ? h("span", { class: "pill warn", title: "The protocol is locked: changes here are amendments, with a reason" }, icon("lock"), "locked") : null,
       h("span", { class: "spacer" }),
       btn("? Help", () => openHelp(t.stage), "ghost", `Help: ${t.label}`),
       !last ? null : s.optional && !["skipped", "done"].includes(s.status) ? btn("Skip…", () => skipStage(t.stage), "ghost", `Skip ${what} (it is optional)`) : null,
@@ -130,7 +131,7 @@ function renderTop() {
     const status = stepStatus(st);
     $("#topbar").replaceChildren(kicker(st),
       h("div", { class: "titlerow" }, h("h1", {}, st.long ?? st.title), pill(status.replace("-", " "), statusKind(status)),
-        S.dev_mode ? pill("🛠 developer mode", "bad") : null),
+        S.dev_mode ? pill([icon("developer"), "developer mode"], "bad") : null),
       // the parts as links instead of repeating the title: each jumps to its section
       h("nav", { class: "infoline", "aria-label": "Parts of this page" }, h("span", { class: "desc" }, `${st.tabs.length} parts:`),
         st.tabs.map((t, i) => [i ? h("span", { class: "muted", "aria-hidden": "true" }, "·") : null,
@@ -146,8 +147,8 @@ function renderTop() {
       byMap ? h("span", { class: "muted" }, st.long ?? st.title) : null,
       st.tabs.length > 1 && !byMap ? null : pill(s.status.replace("-", " "), statusKind(s.status)),
       byMap && s.optional ? pill("optional", "info") : null,
-      S.dev_mode ? pill("🛠 developer mode", "bad")
-        : locked && ["questions", "concepts", "protocol", "methods", "charting"].includes(CUR) ? h("span", { class: "pill warn", title: "The protocol is locked: changes here are amendments, with a reason" }, "🔒 locked") : null,
+      S.dev_mode ? pill([icon("developer"), "developer mode"], "bad")
+        : locked && ["questions", "concepts", "protocol", "methods", "charting"].includes(CUR) ? h("span", { class: "pill warn", title: "The protocol is locked: changes here are amendments, with a reason" }, icon("lock"), "locked") : null,
       h("span", { class: "spacer" }),
       btn("? Help", () => openHelp(CUR), "ghost"),
       s.optional && !["skipped", "done"].includes(s.status) ? btn("Skip…", skipStage, "ghost", `Skip ${what} (it is optional)`) : null,
@@ -157,7 +158,7 @@ function renderTop() {
     h("div", { class: "infoline" },
       h("span", { class: "desc" }, PART_DESC[`${CUR}:${tab.part}`] ?? s.desc, s.reason ? h("span", { class: "muted" }, ` — skipped: ${s.reason}`) : null),
       aiStep ? h("button", { class: "btn sm ai-chip" + (aiMode === "off" ? "" : " on"), "aria-expanded": String(aiOpen), title: "AI assistance for this step: who does what, and the prompt for Claude",
-        onclick: () => { store.set("ai_open", aiOpen ? "" : "1"); render(); } }, `🤖 AI: ${aiStep.modes.find(m => m.key === aiMode).label} ${aiOpen ? "▴" : "▾"}`) : null,
+        onclick: () => { store.set("ai_open", aiOpen ? "" : "1"); render(); } }, icon("assist"), `AI: ${aiStep.modes.find(m => m.key === aiMode).label} ${aiOpen ? "▴" : "▾"}`) : null,
       savedIn(CUR) || null),
     aiOpen ? aiCard(aiKey) || "" : "");
 }
@@ -182,9 +183,9 @@ function aiCard(key) {
   const toggle = () => { store.set("ai_open", open ? "" : "1"); render(); };
   return h("div", { class: "aicard" + (mode === "off" ? "" : " on") + (open ? " open" : "") },
     h("div", { class: "row" },
-      h("b", {}, "🤖 AI assistance"),
+      h("b", {}, icon("assist"), " AI assistance"),
       segmented(step.modes.map(m => [m.key, m.label]), mode, v => api("ai_mode", { stage: key, mode: v }), "AI assistance for this step"),
-      mode === "off" ? null : btn("📋 Copy prompt", () => copy(step.prompt), "sm primary"),
+      mode === "off" ? null : btn([icon("copy"), "Copy prompt"], () => copy(step.prompt), "sm primary"),
       h("span", { class: "spacer" }),
       h("button", { class: "btn sm ghost ai-toggle", "aria-expanded": String(open), onclick: toggle }, "Close ▴")),
     open ? h("div", { class: "aibody" },
@@ -213,12 +214,12 @@ const STORAGE = {
 };
 
 function savedIn(key) {
-  const icon = p => p === "@library" ? "📚" : /\.(md)$/.test(p) ? "📝" : /\.base$/.test(p) ? "▦" : /\.(csv|json)$/.test(p) ? "🗎" : "📁";
+  const kind = p => icon(p === "@library" ? "library" : /\.(md)$/.test(p) ? "note" : /\.base$/.test(p) ? "table" : /\.(csv|json)$/.test(p) ? "file" : "folder");
   const files = STORAGE[key] || [];
   if (!files.length) return null;
-  return h("details", { class: "savedin" }, h("summary", { title: "Which files in your review folder this step writes" }, `📁 ${files.length} file${files.length > 1 ? "s" : ""} ▾`),
+  return h("details", { class: "savedin" }, h("summary", { title: "Which files in your review folder this step writes" }, icon("folder"), ` ${files.length} file${files.length > 1 ? "s" : ""} ▾`),
     h("div", { class: "files" }, files.map(([p, what]) => [p === "@checklist" ? S.review_type.checklistFile : p, what]).map(([p, what]) => h("button", { class: "file", title: `${S.folder}/${p === "@library" ? "../" + libraryName() : p} — click to open`, onclick: () => openNote(p) },
-      icon(p), " ", p === "@library" ? libraryName() : p, h("span", { class: "muted" }, " · " + what)))));
+      kind(p), " ", p === "@library" ? libraryName() : p, h("span", { class: "muted" }, " · " + what)))));
 }
 
 function renderMetrics() {
@@ -269,5 +270,6 @@ export function render() {
   $("#btnHome").classList.toggle("on", CUR === HOME);
   $("#btnClaude").hidden = !S.ai?.steps[CUR];                      // only on the stages where Claude can help (marked AI)
   const page = $("#page"), st = CUR === HOME ? null : stepOf(CUR);
+  page.className = st ? phaseClass(st.phase) : "";                  // the page's cards take its phase's colour
   page.replaceChildren(...(sectioned(st) ? st.tabs.map(sectionOf) : [PAGES[CUR]()]), CUR === HOME ? "" : pageNav());
 }

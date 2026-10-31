@@ -9,7 +9,7 @@ import { go, goStep, stepOf, stepStatus } from "../shell/navigation.js";
 import { openFinishedExample } from "../shell/reviews.js";
 import { startTour } from "../shell/tour.js";
 import { svg } from "../ui/charts.js";
-import { btn, card, decDot, hlQuery } from "../ui/components.js";
+import { btn, card, decDot, hlQuery, icon } from "../ui/components.js";
 import { folderStrip } from "../ui/folder-strip.js";
 import { phasePicture } from "../ui/phase-picture.js";
 
@@ -17,7 +17,7 @@ import { phasePicture } from "../ui/phase-picture.js";
 // Plain DOM and CSS (no video file), so it works offline and follows the light/dark theme.
 const DEMO = [
   { key: "plan", you: "Write your question (Population, Concept, Context), pick the search terms and set the inclusion rules. Lock the plan before searching.", ai: null, label: "Plan", caption: "Write your question, then turn it into search terms.",
-    draw: el => { const t = h("div", { class: "demo-type" }); el.append(h("div", { class: "demo-lbl" }, "✍ Research question"), t);
+    draw: el => { const t = h("div", { class: "demo-type" }); el.append(h("div", { class: "demo-lbl" }, icon("pen"), " Research question"), t);
       const s = "How do researchers measure how repairable a phone is?"; let i = 0;
       return setInterval(() => { t.textContent = s.slice(0, ++i); }, 45); } },
   { key: "search", you: "Run each string in the databases, export the results and drop the files in. Every search is dated and logged.", ai: null, label: "Find", caption: "Run the search strings in the databases and import the exports. Duplicates are removed.",
@@ -28,7 +28,7 @@ const DEMO = [
       const dbs = [["Scopus", 268], ["Web of Science", 205]].map(([name, hits]) => ({ hits, n: h("b", {}, "–"), el: null }));
       dbs[0].el = h("div", { class: "demo-db" }, "Scopus", dbs[0].n); dbs[1].el = h("div", { class: "demo-db" }, "Web of Science", dbs[1].n);
       const total = h("div", { class: "demo-total" }, h("b", {}, "412"), " unique records · 61 duplicates removed");
-      el.append(h("div", { class: "demo-lbl" }, "🔎 Search string"), code,
+      el.append(h("div", { class: "demo-lbl" }, icon("search"), " Search string"), code,
         h("div", { class: "demo-send" }, arrow, h("div", { class: "demo-dbs" }, dbs.map(d => d.el))), total);
       let t = 0;
       return setInterval(() => {
@@ -44,7 +44,7 @@ const DEMO = [
   { key: "screen", you: "Decide every record. You confirm each suggestion; nothing is decided for you.", ai: "Pre-screen titles, abstracts and full texts; you confirm every suggestion.", label: "Select", caption: "Read each title and abstract: include, unsure or exclude with a reason. Then the full texts.",
     draw: el => { const papers = ["Repairability scoring of smartphones", "Battery chemistry review", "EN 45554 in practice", "Consumer repair behaviour"];
       const rows = papers.map(p => h("div", { class: "demo-row" }, h("span", {}, p), h("span", { class: "demo-dec" })));
-      el.append(h("div", { class: "demo-lbl" }, "☑ Title/abstract screening"), ...rows);
+      el.append(h("div", { class: "demo-lbl" }, icon("checklist"), " Title/abstract screening"), ...rows);
       let i = 0; return setInterval(() => { if (i >= rows.length) return; const d = rows[i].lastChild, ex = i === 1;
         d.textContent = ex ? "✕ exclude · E2" : "✓ include"; d.className = "demo-dec " + (ex ? "bad" : "ok"); i++; }, 700); } },
   { key: "chart", you: "Check every charted paper and correct it; your check is recorded.", ai: "Find and attach the PDFs of the included papers, then prefill the charting form from them.", label: "Chart", caption: "Fill a charting form for every included paper (AI can prefill it; you check).",
@@ -55,7 +55,7 @@ const DEMO = [
   { key: "report", you: "Tick the reporting checklist items and export the tables and BibTeX for the paper.", ai: null, label: "Report", caption: "The PRISMA flow diagram and checklist are made from your decisions.",
     draw: el => { const box = (t, n) => h("div", { class: "demo-flow" }, t, h("b", {}, n));
       const bs = [box("Identified", 412), box("Screened", 318), box("Full text", 64), box("Included", 27)];
-      bs.forEach(b => b.style.opacity = 0); el.append(h("div", { class: "demo-lbl" }, "📊 PRISMA flow"), h("div", { class: "demo-flows" }, bs));
+      bs.forEach(b => b.style.opacity = 0); el.append(h("div", { class: "demo-lbl" }, icon("chart"), " PRISMA flow"), h("div", { class: "demo-flows" }, bs));
       let i = 0; return setInterval(() => { if (i < bs.length) bs[i++].style.opacity = 1; }, 500); } },
 ];
 
@@ -85,8 +85,8 @@ function homeDemo() {
     caption.textContent = DEMO[i].caption;
     // who works in this step: the active card glows (you in green, Claude in the accent colour; both when both)
     side.replaceChildren(
-      h("div", { class: "demo-who you active" }, h("b", {}, "👤 You"), h("p", {}, DEMO[i].you)),
-      h("div", { class: "demo-who ai" + (DEMO[i].ai ? " active" : "") }, h("b", {}, DEMO[i].ai ? "🤖 Claude can help" : "🤖 Claude"),
+      h("div", { class: "demo-who you active" }, h("b", {}, icon("user"), " You"), h("p", {}, DEMO[i].you)),
+      h("div", { class: "demo-who ai" + (DEMO[i].ai ? " active" : "") }, h("b", {}, icon("assist"), DEMO[i].ai ? " Claude can help" : " Claude"),
         h("p", {}, DEMO[i].ai || "Not used in this step: it is your own work."),
         DEMO[i].ai ? h("p", { class: "demo-note" }, "Only if you switch it on; Claude suggests, you confirm.") : null));
     segs.forEach((g, m) => {
@@ -97,7 +97,7 @@ function homeDemo() {
     });
     ring.querySelector(".mid-n").textContent = `${i + 1} of ${n}`;
     ring.querySelector(".mid-l").textContent = DEMO[i].label;
-    ring.querySelector(".mid-ai").textContent = DEMO[i].ai ? "🤖 AI can help" : "";
+    ring.querySelector(".mid-ai").textContent = DEMO[i].ai ? "AI can help" : "";
     play.textContent = playing ? "⏸ Pause" : "▶ Play";
     timer = setTimeout(() => playing ? show((i + 1) % n) : null, STEP_MS);
   }
@@ -177,7 +177,7 @@ PAGES.home = () => {
     card("Your review is a folder on your PC", "Nothing is uploaded and there is no account. Every note is plain Markdown, so the folder opens in Obsidian (or any text editor) as it is.",
       folderStrip(),
       h("p", { class: "small muted", style: "margin:10px 0 0" }, "In Obsidian: Open folder as vault, and choose the review's folder (or the folder above it, e.g. your vault). ",
-        h("a", { href: "https://github.com/Abdulhamid-Baghdadi/scoping-review-workbench/releases/latest/download/scoping-review-workbench.zip" }, "💾 Desktop version"))));
+        h("a", { href: "https://github.com/Abdulhamid-Baghdadi/scoping-review-workbench/releases/latest/download/scoping-review-workbench.zip" }, icon("download"), " Desktop version"))));
 };
 
 /** Opens the finished example review (backend.exampleEntry), on its Report step: the result first, Back walks through it. */

@@ -30,7 +30,7 @@ export function autoSave(key, save, guard = null) {
   const schedule = () => {
     const old = PENDING.get(key);
     if (old?.timer) clearTimeout(old.timer);
-    if (lockedFor(guard)) { PENDING.set(key, { timer: null, save }); setSaveState("locked", "🔒 Saved when you leave the field: it is an amendment"); return; }
+    if (lockedFor(guard)) { PENDING.set(key, { timer: null, save }); setSaveState("locked", "Saved when you leave the field: it is an amendment"); return; }
     setSaveState("saving", "Saving…");
     PENDING.set(key, { timer: setTimeout(() => runSave(key, save), 1000), save });
   };

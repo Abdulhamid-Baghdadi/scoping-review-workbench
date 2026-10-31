@@ -81,6 +81,8 @@ try {
     if ((await where()) !== hash) throw new Error(`could not reach ${hash}`);
   };
   const actions = {};
+  // our own icons, never emoji, in every page's text (they look different on every system; web/art/icons.js)
+  actions["no emoji"] = !Object.values(pages).some(t => /[\u{1F300}-\u{1FAFF}⚙⚠✍☑]/u.test(t));
   await goTo("#questions"); await goTo("#screening");      // from the start, so the first #screening is titles and abstracts
   await page.evaluate(() => document.querySelector("#page .queue .qitem")?.click()); await page.waitForTimeout(200);
   // the engine's own count of title/abstract decisions, before and after one decision by keyboard

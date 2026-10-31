@@ -8,7 +8,7 @@ import { D, S } from "../core/state.js";
 import { DB_LINKS } from "./queries.js";
 import { PAGES } from "../shell/registry.js";
 import { goTab, stepOf } from "../shell/navigation.js";
-import { btn, card, copy, dropzone, field, hlQuery, pill } from "../ui/components.js";
+import { btn, card, copy, dropzone, field, hlQuery, icon, pill } from "../ui/components.js";
 import { confirmBox, toast } from "../ui/dialogs.js";
 
 // Step 4, Search & import: every record comes from a planned database search. One card per planned database with
@@ -111,7 +111,7 @@ PAGES.searches = () => {
         h("div", { class: "small muted" }, "Paste it into the database's advanced search, run it, and export ", h("b", {}, "all"), " results."),
         h("div", { class: "row", style: "margin-top:6px" },
           DB_LINKS[db] ? h("a", { class: "btn sm", href: DB_LINKS[db], target: "_blank", rel: "noopener", onclick: () => { p.opened = true; drawTracker(); } }, `Open ${db} ↗`) : null,
-          h("span", { class: "small" }, "💾 ", EXPORT_HINTS[db] || "Export all results as CSV, RIS or BibTeX, with abstracts.")))),
+          h("span", { class: "small" }, icon("download"), " ", EXPORT_HINTS[db] || "Export all results as CSV, RIS or BibTeX, with abstracts.")))),
       h("div", { class: "imp-row" }, h("span", { class: "imp-n" }, "3"), h("div", { class: "grow" },
         dropzone("Drop the export here (CSV, RIS, BibTeX or Web of Science TXT)", ".ris,.bib,.csv,.txt,.tsv,.nbib", f => { path = f; p.file = true; drawTracker(); }),
         h("div", { class: "grid2", style: "margin-top:8px" }, field("Date you ran it", date), field("Filters you used", filters)),
@@ -133,5 +133,5 @@ PAGES.searches = () => {
         h("tr", {}, ["ID", "Source", "Date", "Records", "New", "Dupl.", "Query", ""].map(t => h("th", {}, t))),
         S.searches.map(s => h("tr", {}, h("td", {}, s.id), h("td", {}, s.database, " ", pill(s.kind, s.kind === "database" ? "accent" : "")), h("td", { class: "small" }, s.date),
           h("td", { class: "num" }, s.records), h("td", { class: "num" }, s.new), h("td", { class: "num" }, s.duplicates), h("td", { class: "small", style: "font-family:var(--mono);max-width:360px;word-break:break-word" }, s.query), h("td", {}, undoImport(s))))))
-        : h("div", { class: "empty" }, h("div", { class: "big" }, "🔎"), "No searches imported yet.")));
+        : h("div", { class: "empty" }, h("div", { class: "big" }, icon("search")), "No searches imported yet.")));
 };

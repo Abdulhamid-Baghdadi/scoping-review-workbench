@@ -8,7 +8,7 @@ import { D, PART, S } from "../core/state.js";
 import { PAGES } from "../shell/registry.js";
 import { render } from "../shell/chrome.js";
 import { flowDiagram } from "../ui/charts.js";
-import { bar, btn, card, labelBy, libraryName, openNote, pill } from "../ui/components.js";
+import { bar, btn, card, icon, labelBy, libraryName, openNote, pill } from "../ui/components.js";
 import { confirmBox, modal, toast } from "../ui/dialogs.js";
 
 // Citations between the papers of the library (formerly Library Studio's Citations page): preview, then write.
@@ -26,7 +26,7 @@ function citationsCard() {
     }, "primary")) : null);
   return card("Citations in your library", `What each library paper cites, from OpenAlex reference lists: 'cites' links to the library papers it cites and lists the others by DOI (an OpenAlex id when there is none). Which papers cite a paper: its backlinks in Obsidian. Run it again after adding papers: DOIs of papers now in the library become links. Nothing is written until you confirm.`,
     h("div", { class: "row" }, h("span", { class: "small muted", style: "flex:1" }, `Library: ${libraryName()}. Uses about one OpenAlex request per 50 papers, and one per 100 cited works.`),
-      btn("🔗 Check citations", async e => {
+      btn([icon("link"), "Check citations"], async e => {
         const r = await busy(e.currentTarget, () => api("library_citations", {}, { silent: true }));
         if (r) show(r, false);
       }, "")), out);
@@ -61,16 +61,16 @@ PAGES.report = () => {
     kept.length ? card("Export to your Obsidian library", `When the review is finished, the papers you kept become publication notes in ${libraryName()}, with their PDFs; then the citations between your library papers are updated ('cites'). Everything else stays in this review's folder.`,
       h("div", { class: "row" }, h("span", { class: "small muted", style: "flex:1" },
         `${kept.length} included paper(s); ${kept.filter(r => r.publication).length} already linked to a library note. `,
-        S.publication_template ? `New notes use your template “${S.publication_template}”` : "New notes use the app's own template (choose yours in ⚙ Settings → Review settings)",
+        S.publication_template ? `New notes use your template “${S.publication_template}”` : "New notes use the app's own template (choose yours in Settings → Review settings)",
         ", plus 'added_by' (this review), 'added_on' (the date), 'citekey' and the OpenAlex id. A paper already in your library only gets this review in its 'included_in'."),
-        btn("📚 Export to Obsidian library", async e => {
+        btn([icon("library"), "Export to Obsidian library"], async e => {
           const button = e.currentTarget;
           if (await confirmBox("Export to Obsidian library", `Export ${kept.length} included paper(s) to ${libraryName()} as publication notes, then update the citations between library papers (OpenAlex)? Do this when screening is final.`, "Export"))
             busy(button, () => api("add_to_library"));
         }, "primary"))) : null,
     S.library?.length ? citationsCard() : null,
     syncCard(),
-    kept.length || S.library?.length ? null : h("div", { class: "card empty" }, "Nothing to do here yet: include papers first, and choose your library folder in ⚙ Settings → Review settings."));
+    kept.length || S.library?.length ? null : h("div", { class: "card empty" }, "Nothing to do here yet: include papers first, and choose your library folder in Settings → Review settings."));
   if (part === "exports") return h("div", {},
     card("Traceability", "Every change of a screening decision is in 08 - Decision log.csv (when, who, how), chained with SHA-256 so that an edited row shows. The review package collects the protocol, searches, decisions, log, charting, flow, checklist and AI use, with a checksum per file, ready to deposit on OSF or Zenodo.",
       h("div", { class: "row" },
@@ -79,7 +79,7 @@ PAGES.report = () => {
           if (v) toast(v.intact ? `Decision log: ${v.rows} rows, chain intact` : `Decision log: chain broken at row ${v.brokenAt} — a row was edited or removed`, v.intact ? "ok" : "err");
         }, ""),
         btn("Open the log", () => openNote("08 - Decision log.csv"), "ghost"),
-        btn("📦 Make review package", async e => { const j = await busy(e.currentTarget, () => api("review_package")); if (j?.download) download(j.download); }, "primary"))),
+        btn([icon("package"), "Make review package"], async e => { const j = await busy(e.currentTarget, () => api("review_package")); if (j?.download) download(j.download); }, "primary"))),
     exportsCard());
   return h("div", {},
     h("div", { class: "grid2" },

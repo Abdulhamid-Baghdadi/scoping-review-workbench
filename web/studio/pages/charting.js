@@ -11,7 +11,7 @@ import { render } from "../shell/chrome.js";
 import { exampleFor } from "../shell/help.js";
 import { goTab, stepOf } from "../shell/navigation.js";
 import { fieldLabel } from "./charting-form.js";
-import { autosize, bar, btn, card, decDot, field, openNote, pill, segmented } from "../ui/components.js";
+import { autosize, bar, btn, card, decDot, field, icon, openNote, pill, segmented } from "../ui/components.js";
 
 PAGES.charting = () => {
   const inc = S.records.filter(r => r.ft_decision === "include");
@@ -44,7 +44,7 @@ PAGES.charting = () => {
           h("div", { class: "small muted", style: "margin-top:4px" }, r.authors, r.year ? " · " + r.year : "", r.journal ? " · " + r.journal : "")),
         pill(...LABEL[k])),
       h("div", { class: "row", style: "margin:8px 0 12px" },
-        r.pdf_status === "found" ? btn("📄 Open PDF", () => api("open_note", { note: `10 - Full texts/${r.file}.pdf` }, { silent: true }), "")
+        r.pdf_status === "found" ? btn([icon("pdf"), "Open PDF"], () => api("open_note", { note: `10 - Full texts/${r.file}.pdf` }, { silent: true }), "")
           : h("span", { class: "small muted" }, "No PDF: chart from the abstract, and say so."),
         r.doi ? h("a", { href: "https://doi.org/" + r.doi, target: "_blank", class: "small" }, "DOI ↗") : null,
         h("span", { style: "flex:1" }),

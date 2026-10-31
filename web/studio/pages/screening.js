@@ -7,7 +7,7 @@ import { h, singleKeys, store } from "../core/dom.js";
 import { D, REVIEW, S, SC } from "../core/state.js";
 import { PAGE_KEYS, PAGES } from "../shell/registry.js";
 import { render } from "../shell/chrome.js";
-import { bar, btn, decDot, decKind, field, highlight, openNote, pill, segmented } from "../ui/components.js";
+import { bar, btn, decDot, decKind, field, highlight, icon, openNote, pill, segmented } from "../ui/components.js";
 import { announce, confirmBox } from "../ui/dialogs.js";
 
 // The screening keys: I include, U unsure (title/abstract), E then 1–9 exclude with a reason, Z undo, ← → move;
@@ -140,7 +140,7 @@ PAGES.screening = () => {
   if (SC.filter === "presort") {
     main = presortView(q);
   } else if (!rec) {
-    main = h("div", { class: "card empty" }, h("div", { class: "big" }, total ? "🎉" : "📭"),
+    main = h("div", { class: "card empty" }, h("div", { class: "big" }, icon(total ? "done" : "inbox")),
       h("h2", {}, SC.filter === "suggest" ? "All of Claude's suggestions are reviewed" : total ? "Nothing left to screen here" : "No records yet"),
       h("p", {}, total ? "Switch to 'All' to review earlier decisions, or continue with the next step." : "Import a database export first (step Search & import)."),
       lastDecisionLine(fresh));
@@ -166,12 +166,12 @@ PAGES.screening = () => {
         null),
       h("h2", {}, rec.title),
       h("button", { class: "file", style: "margin:-2px 0 6px", title: `${S.record_files[rec.record_id] || ""}: your decision is saved in this note`, onclick: () => openNote(S.record_files[rec.record_id]) },
-        "📝 Open this paper's note"),
+        icon("note"), " Open this paper's note"),
       h("div", { class: "authors" }, rec.authors),
       h("div", { class: "row", style: "margin-top:8px" },
         rec.doi ? h("a", { href: "https://doi.org/" + rec.doi, target: "_blank", class: "btn sm" }, "DOI ↗") : null,
         rec.oa_url ? h("a", { href: rec.oa_url, target: "_blank", class: "btn sm" }, "Open access ↗") : null,
-        SC.stage === "ft" && rec.pdf_status === "found" ? btn("📄 Open the PDF", () => api("open_note", { note: `10 - Full texts/${rec.file}.pdf` }, { silent: true }), "sm primary") : null,   // the full text is what this stage reads
+        SC.stage === "ft" && rec.pdf_status === "found" ? btn([icon("pdf"), "Open the PDF"], () => api("open_note", { note: `10 - Full texts/${rec.file}.pdf` }, { silent: true }), "sm primary") : null,   // the full text is what this stage reads
         SC.stage === "ft" && rec.pdf_status !== "found" ? pill(rec.pdf_status ? "PDF: " + rec.pdf_status : "PDF: not checked", rec.pdf_status ? "bad" : "") : null),
       absBox,
       SC.filter === "suggest" && rec[aiKey("decision")] ? suggestionBox(rec) : null,
@@ -242,7 +242,7 @@ function suggestionBox(rec) {
   const d = rec[aiKey("decision")], code = rec[aiKey("reason")] || "", why = rec[aiKey("why")] || "";
   const reason = d === "exclude" ? S.reasons[SC.stage].find(r => r.split(" ")[0] === code) ?? code : "";
   return h("div", { class: "ai-suggestion", role: "note", "aria-label": "Claude's suggestion" },
-    h("div", { class: "row" }, h("span", { class: "ai-label" }, "🤖 Claude suggests"), decDot(d), h("b", {}, { include: "Include", exclude: "Exclude", unsure: "Unsure" }[d] ?? d),
+    h("div", { class: "row" }, h("span", { class: "ai-label" }, icon("assist"), " Claude suggests"), decDot(d), h("b", {}, { include: "Include", exclude: "Exclude", unsure: "Unsure" }[d] ?? d),
       h("span", { class: "spacer" }), btn(["Accept ", h("kbd", {}, "Enter")], acceptSuggestion, "sm", "Make Claude's suggestion your decision")),
     reason ? h("div", { class: "ai-reason" }, reason) : null,
     why ? h("p", {}, why) : null,

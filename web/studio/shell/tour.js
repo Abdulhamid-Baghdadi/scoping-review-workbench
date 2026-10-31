@@ -4,12 +4,12 @@
  */
 import { h, store } from "../core/dom.js";
 import { go } from "./navigation.js";
-import { btn } from "../ui/components.js";
+import { btn, icon } from "../ui/components.js";
 
 // A short, plain explanation of what the app is for, one highlighted part of the screen at a time.
 // Offered once on the first visit; the button on the Homepage replays it.
 const TOUR = [
-  { title: "Welcome to Scoping Review Workbench 👋",
+  { title: "Welcome to Scoping Review Workbench",
     text: "This app guides you through a scoping review, step by step: from your first idea to a finished PRISMA report. It keeps every step documented, so your review is transparent and easy to reproduce." },
   { target: ".flowmap", title: "Your review, step by step",
     text: "The map shows the whole review: plan (question, search, inclusion rules, methods, lock), the PRISMA flow with your live counts (records found, screened, included), then charting the data and the report. Click any step to open it; the ringed one is where you are. While you work it stays folded to this one line: Map ▾ unfolds it." },
@@ -18,8 +18,8 @@ const TOUR = [
   { target: "#draftBar", title: "Your files stay on your PC",
     text: "You start in a draft kept in this browser. Save it to a folder when you want to keep it: the review becomes plain notes, tables and PDFs on your PC. Nothing is uploaded." },
   { target: ".toolbar", title: "Tools for every step",
-    text: "The timeline of everything you did, the PRISMA-ScR reporting checklist and, if you want it, AI help from Claude, which only ever suggests. The glossary and keyboard shortcuts are under ⚙ Settings." },
-  { title: "Ready? Start with your question ✍️",
+    text: "The timeline of everything you did, the PRISMA-ScR reporting checklist and, if you want it, AI help from Claude, which only ever suggests. The glossary and keyboard shortcuts are under Settings." },
+  { title: "Ready? Start with your question",
     text: "Step 1 is your research question: who or what, which topic, which setting, and the main question. You can replay this tour from the Homepage." },
 ];
 
@@ -27,7 +27,7 @@ export function offerTour() {
   const card = h("div", { class: "tour-offer", role: "region", "aria-label": "App tour" },
     h("div", { class: "tour-offer-text" }, h("b", {}, "New here?"), " Take the 1-minute tour to see what Scoping Review Workbench does."),
     h("div", { class: "row" },
-      btn("🎓 Start tour", () => { card.remove(); startTour(); }, "sm primary"),
+      btn([icon("compass"), "Start tour"], () => { card.remove(); startTour(); }, "sm primary"),
       btn("Not now", () => { card.remove(); store.set("toured", "skipped"); }, "sm ghost")));
   (document.getElementById("offer") ?? document.body).replaceChildren(card);   // in the page flow: it covers nothing
 }

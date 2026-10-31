@@ -7,7 +7,7 @@ import { h } from "../core/dom.js";
 import { D, S } from "../core/state.js";
 import { PAGES } from "../shell/registry.js";
 import { render } from "../shell/chrome.js";
-import { btn, card, pill, segmented } from "../ui/components.js";
+import { btn, card, icon, pill, segmented } from "../ui/components.js";
 import { announce } from "../ui/dialogs.js";
 
 // PDFs already on this PC: scan a folder, show the matches, copy the ticked ones into the review
@@ -63,7 +63,7 @@ PAGES.retrieval = () => {
     const file = h("input", { type: "file", accept: ".pdf", style: "display:none", onchange: async () => { const p = await upload(file.files[0]);
       done(r, () => api("attach_pdf", { record_id: r.record_id, path: p }), `${r.record_id}: PDF attached.`); } });
     const box = h("div", { style: "display:flex;flex-direction:column;gap:4px;align-items:stretch;min-width:120px" }, file);
-    if (st(r) === "found") box.append(btn("📄 Open PDF", () => api("open_note", { note: `10 - Full texts/${r.file}.pdf` }, { silent: true }), "sm"),
+    if (st(r) === "found") box.append(btn([icon("pdf"), "Open PDF"], () => api("open_note", { note: `10 - Full texts/${r.file}.pdf` }, { silent: true }), "sm"),
       btn("Replace", () => file.click(), "sm ghost"));
     else if (st(r) === "not") box.append(btn("Undo", () => done(r, () => api("mark_pdf", { record_id: r.record_id, status: "" }), `${r.record_id}: back to find.`), "sm ghost"));
     else box.append(btn("Attach PDF", () => file.click(), "sm"), btn("Not retrieved", () => done(r, () => api("mark_pdf", { record_id: r.record_id, status: "not-retrieved" }), `${r.record_id}: marked not retrieved.`), "sm ghost"));
@@ -72,9 +72,9 @@ PAGES.retrieval = () => {
   return h("div", {},
     card("Get the full texts", `${all.length} papers passed the title and abstract check: ${n("found")} found · ${n("not")} not retrieved · ${n("find")} to find`,
       h("div", { class: "row", style: "margin-bottom:12px" },
-        btn("📁 Find PDFs in a folder…", e => busy(e.currentTarget, () => scanPdfs()), "primary"),
+        btn([icon("folder"), "Find PDFs in a folder…"], e => busy(e.currentTarget, () => scanPdfs()), "primary"),
         S.pdf_folders.slice(0, 3).map(f => btn("↻ " + f.split(/[\\/]/).pop(), e => busy(e.currentTarget, () => scanPdfs(f)), "sm ghost")),
-        btn("🔓 Find open-access links", e => busy(e.currentTarget, () => api("find_oa")), ""),
+        btn([icon("unlock"), "Find open-access links"], e => busy(e.currentTarget, () => api("find_oa")), ""),
         h("span", { class: "small muted" }, "First the PDFs you already have, then open access, then your university access via the DOI. A missing PDF is not an exclusion.")),
       D.scan ? scanResults() : null,
       h("div", { class: "row", style: "margin-bottom:10px" },

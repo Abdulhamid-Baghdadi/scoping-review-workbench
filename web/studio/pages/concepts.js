@@ -7,7 +7,7 @@ import { autoSave } from "../core/autosave.js";
 import { debounce, h } from "../core/dom.js";
 import { D, S } from "../core/state.js";
 import { PAGES } from "../shell/registry.js";
-import { btn, card, chipsInput, field, iconBtn, segmented } from "../ui/components.js";
+import { btn, card, chipsInput, field, icon, iconBtn, segmented } from "../ui/components.js";
 import { searchStringCards } from "./queries.js";
 import { announce } from "../ui/dialogs.js";
 
@@ -40,7 +40,7 @@ PAGES.concepts = () => {
           h("span", { class: "spacer", style: "flex:1" }),
           Object.assign(iconBtn("↑", "Move this block up", restructure(() => { [d[i - 1], d[i]] = [d[i], d[i - 1]]; })), { disabled: !i }),
           Object.assign(iconBtn("↓", "Move this block down", restructure(() => { [d[i + 1], d[i]] = [d[i], d[i + 1]]; })), { disabled: i === d.length - 1 }),
-          iconBtn("🗑", `Delete the block “${c.name || "unnamed"}”`, () => remove(i), "danger block-delete")),   // set apart from ↑ ↓ (a slip there deletes)
+          iconBtn(icon("trash"), `Delete the block “${c.name || "unnamed"}”`, () => remove(i), "danger block-delete")),   // set apart from ↑ ↓ (a slip there deletes)
         chipsInput(c.terms, () => refresh(), undefined, `Add a term to “${c.name || `block ${i + 1}`}”`),
         h("div", { class: "small muted", style: "margin-top:5px" }, `${c.terms.length} term(s) · joined with OR · * = any ending, e.g. repairab* → repairable, repairability`))]);
     if (D.deletedBlock) blocks.splice(Math.min(D.deletedBlock.index, d.length) * 2, 0, deleted());   // two nodes per block (joiner + block)
