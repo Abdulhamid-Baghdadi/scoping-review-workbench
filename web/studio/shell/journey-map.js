@@ -31,17 +31,22 @@ function flowHere() {
     charting: "extract", report: "report" }[CUR] ?? null;
 }
 
+/** The class that gives a phase its colour (style.css, "phase-plan" …): the phase comes from the review's steps. */
+export const phaseClass = phase => phase ? `phase-${phase.toLowerCase()}` : "";
+
 function flowGroups() {
   const f = S.flow;
   const step = key => S.steps.find(s => s.key === key);
   const stepNode = (id, key, label) => step(key) && { id, step: step(key), label, go: () => goStep(step(key)) };
   const screen = st => () => { SC.stage = st; store.set("sc_stage", st); SC.id = null; go("screening"); };
+  // each group's phase is the phase of its first step, so the map and the page header always agree
+  const phaseOf = key => step(key)?.phase;
   return [
-    { phase: "Plan", nodes: [stepNode("question", "question", "Question"), stepNode("search", "search", "Search strategy"), stepNode("rules", "rules", "Inclusion & exclusion rules"), stepNode("methods", "methods", "Methods"), stepNode("lock", "lock", "Lock & register")] },
-    { phase: "Find", prisma: true, nodes: [
+    { phase: phaseOf("question"), nodes: [stepNode("question", "question", "Question"), stepNode("search", "search", "Search strategy"), stepNode("rules", "rules", "Inclusion & exclusion rules"), stepNode("methods", "methods", "Methods"), stepNode("lock", "lock", "Lock & register")] },
+    { phase: phaseOf("import"), prisma: true, nodes: [
       { id: "identified", step: step("import"), label: "Records found", n: f.n_db + f.n_other, minus: f.duplicates > 0 ? `${f.duplicates} duplicates` : "", go: () => go("searches"),
         tip: `Search & import: records from the databases (${f.n_db}) and other sources (${f.n_other}); duplicates are removed before screening.` },] },
-    { phase: "Select", prisma: true, nodes: [
+    { phase: phaseOf("screen"), prisma: true, nodes: [
       { id: "screened", step: step("screen"), label: "Titles & abstracts", n: f.unique, minus: f.ta_excluded ? `${f.ta_excluded} excluded` : "", open: f.ta_pending,
         go: screen("ta"), tip: `Screen papers: titles and abstracts (${f.ta_pending} still to do).` },
       { id: "sought", label: "Full texts sought", n: f.sought, minus: f.not_retrieved ? `${f.not_retrieved} not found` : "", go: () => go("retrieval"),
@@ -49,8 +54,8 @@ function flowGroups() {
       { id: "assessed", label: "Full texts read", n: f.assessed, minus: f.ft_excluded ? `${f.ft_excluded} excluded` : "", open: f.ft_pending,
         go: screen("ft"), tip: `Screen papers: full texts (${f.ft_pending} still to do).` },
       { id: "included", label: "Included", n: f.included, good: true, go: screen("ft"), tip: "The papers your review is based on." }] },
-    { phase: "Chart", nodes: [stepNode("extract", "extract", "Chart the data")] },
-    { phase: "Report", nodes: [stepNode("report", "report", "Report")] },
+    { phase: phaseOf("extract"), nodes: [stepNode("extract", "extract", "Chart the data")] },
+    { phase: phaseOf("report"), nodes: [stepNode("report", "report", "Report")] },
   ].map(g => ({ ...g, nodes: g.nodes.filter(Boolean) }));
 }
 
@@ -77,7 +82,7 @@ export function flowMap() {
         h("span", {}, SHORT[n.id] ?? n.label), h("b", {}, Number(n.n).toLocaleString()));
     };
     return h("nav", { class: "flowmap compact", "aria-label": "Steps of the review, with the PRISMA flow" },
-      groups.flatMap((g, i) => [i ? arrow() : null, h("span", { class: `fmc-group ${g.prisma ? "prisma" : "steps"} ${g.nodes.length === 1 && !g.prisma ? "single" : ""}`, title: g.phase },
+      groups.flatMap((g, i) => [i ? arrow() : null, h("span", { class: `fmc-group ${phaseClass(g.phase)} ${g.prisma ? "prisma" : "steps"} ${g.nodes.length === 1 && !g.prisma ? "single" : ""}`, title: g.phase },
         h("span", { class: "fmc-phase" }, g.phase), g.nodes.flatMap((n, j) => [j && g.prisma && g.phase !== "Find" ? h("span", { class: "fmc-sep", "aria-hidden": "true" }, n.id === "reviewer" ? "·" : "›") : null, item(n)]))]),
       h("span", { class: "spacer" }),
       iconBtn("⤢", "Show the full PRISMA flow diagram", full),
@@ -99,7 +104,7 @@ export function flowMap() {
     : h("div", { class: "fm-nodes" }, g.nodes.flatMap((n, j) => [j && n.id !== "reviewer" ? arrow() : null, node(n)]));
   return h("nav", { class: "flowmap", "aria-label": "Steps of the review, with the PRISMA flow" },
     h("div", { class: "fm-track" }, groups.flatMap((g, i) => [i ? arrow() : null,
-      h("div", { class: `fm-group ${g.prisma ? "prisma" : "steps"}` }, h("div", { class: "fm-phase" }, g.phase), nodesOf(g))])),
+      h("div", { class: `fm-group ${phaseClass(g.phase)} ${g.prisma ? "prisma" : "steps"}` }, h("div", { class: "fm-phase" }, g.phase), nodesOf(g))])),
     h("div", { class: "fm-tools" }, iconBtn("⤢", "Show the full PRISMA flow diagram", full),
       h("button", { class: "btn sm ghost fm-toggle", onclick: toggle, "aria-expanded": "true", title: "Fold the map to one line" }, "▴")));
 }

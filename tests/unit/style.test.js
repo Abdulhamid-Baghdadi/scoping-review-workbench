@@ -7,6 +7,7 @@ import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { REVIEW_TYPES } from "../../src/domain/stages.js";
 
 const WEB = fileURLToPath(new URL("../../web/", import.meta.url));
 const css = readFileSync(join(WEB, "style.css"), "utf8");
@@ -69,6 +70,16 @@ test("every font the style sheet loads is in web/fonts/, with the licence of its
     const licence = join(WEB, "fonts", `OFL-${family.toLowerCase().replace(/ /g, "-")}.txt`);
     assert.ok(existsSync(licence), `${family}: no licence at ${licence}`);
     assert.match(readFileSync(licence, "utf8"), /SIL Open Font License, Version 1\.1/);
+  }
+});
+
+test("every phase a review type names has its colour, in both themes (the map and the page header use it)", () => {
+  const phases = new Set(Object.values(REVIEW_TYPES).flatMap(t => t.steps.map(s => s.phase.toLowerCase())));
+  assert.ok(phases.size >= 5, "the scoping review has five phases");
+  for (const p of phases) {
+    assert.match(css, new RegExp(`\\.phase-${p}\\s*{\\s*--phase:\\s*var\\(--${p}\\)`), `style.css gives .phase-${p} no colour`);
+    hex(LIGHT, p); hex(DARK, p);                         // a token in each theme, held to 4.5:1 by the tests above
+    assert.ok(TEXTS.includes(p), `--${p} is not in the contrast check`);
   }
 });
 

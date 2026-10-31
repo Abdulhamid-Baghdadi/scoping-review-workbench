@@ -1,7 +1,7 @@
 # Visual refresh: plan
 
-Status: steps 1–3 (fonts, tokens, type) done on 31 October 2026, screenshots in
-[visual-refresh/after-steps-1-3/](visual-refresh/after-steps-1-3/); steps 4–10 still to do. The screenshots (7.5 MB) stay on the author's PC and are not in the repository, so the
+Status: steps 1–3 (fonts, tokens, type) and 4 (journey map and page header) done on 31 October 2026, screenshots in
+[visual-refresh/after-steps-1-3/](visual-refresh/after-steps-1-3/); steps 5–10 still to do. The screenshots (7.5 MB) stay on the author's PC and are not in the repository, so the
 picture links below work only there; the mock-up itself is. Mock-up: [visual-refresh/mockup.html](visual-refresh/mockup.html)
 (open it with `npm run serve` at http://localhost:8770/docs/visual-refresh/mockup.html; Homepage and Screening, light
 and dark). Before screenshots of every page, light, dark and 390 px wide: [visual-refresh/before/](visual-refresh/before/).

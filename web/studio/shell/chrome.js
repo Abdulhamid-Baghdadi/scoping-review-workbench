@@ -7,7 +7,7 @@ import { $, h, store } from "../core/dom.js";
 import { CUR, HOME, PART, REVIEW, S, SC } from "../core/state.js";
 import { PAGES } from "./registry.js";
 import { openHelp } from "./help.js";
-import { flowMap } from "./journey-map.js";
+import { flowMap, phaseClass } from "./journey-map.js";
 import { curTab, go, goTab, pageIndex, pageSequence, sectioned, sectionId, skipStage, stage, stepOf, stepStatus } from "./navigation.js";
 import { openReviewFolder, renderDraftBar, saveDraft, switchReview } from "./reviews.js";
 import { btn, copy, iconBtn, libraryName, openNote, pill, segmented, statusKind } from "../ui/components.js";
@@ -109,6 +109,10 @@ function nothingYet(key) {
   return "";
 }
 
+/** Above the title: where this step sits in the review, "SELECT · STEP 7 OF 9", in its phase's colour. */
+const kicker = st => h("div", { class: `kicker ${phaseClass(st.phase)}` }, h("i", { "aria-hidden": "true" }),
+  h("span", {}, `${st.phase} · step ${S.steps.indexOf(st) + 1} of ${S.steps.length}`));
+
 function renderTop() {
   const mapbar = $("#mapbar");
   if (CUR === HOME) {                                               // the Homepage explains; the page itself holds the choices
@@ -125,7 +129,7 @@ function renderTop() {
   const byMap = st.key === "screen";
   if (sectioned(st)) {
     const status = stepStatus(st);
-    $("#topbar").replaceChildren(
+    $("#topbar").replaceChildren(kicker(st),
       h("div", { class: "titlerow" }, h("h1", {}, st.long ?? st.title), pill(status.replace("-", " "), statusKind(status)),
         S.dev_mode ? pill("🛠 developer mode", "bad") : null),
       // the parts as links instead of repeating the title: each jumps to its section
@@ -137,7 +141,7 @@ function renderTop() {
   const what = st.tabs.length > 1 ? `“${tab.label}”` : "this step";
   const aiKey = CUR === "screening" && SC.stage === "ft" ? "fulltext" : CUR;   // full texts have their own AI choice
   const aiStep = S.ai?.steps[aiKey], aiMode = aiStep && (S.ai.modes[aiKey] || "off"), aiOpen = store.get("ai_open", "") === "1";
-  $("#topbar").replaceChildren(
+  $("#topbar").replaceChildren(kicker(st),
     h("div", { class: "titlerow" },
       h("h1", {}, byMap ? tab.label : st.long ?? st.title),
       byMap ? h("span", { class: "muted" }, st.long ?? st.title) : null,

@@ -754,3 +754,16 @@ details.savedin .files { display: flex; flex-wrap: wrap; gap: 6px; }
 .demo-arrow, .fm-phase { font-size: 12px; }
 .fmc-phase { font-size: 11.5px; }
 .drawer .db h3 { font-size: 14px; }
+
+/* ---------- phases: each phase of the review in its colour, always with the phase's name ---------- */
+/* The phase of a step comes from the review's steps (the snapshot); this is the only place that gives it a colour. */
+.phase-plan { --phase: var(--plan); } .phase-find { --phase: var(--find); } .phase-select { --phase: var(--select); }
+.phase-chart { --phase: var(--chart); } .phase-report { --phase: var(--report); }
+/* the journey map: each group with a coloured top edge, its name in its colour, the page on screen ringed in it */
+.fm-group[class*="phase-"], .fmc-group[class*="phase-"] { background: color-mix(in srgb, var(--phase) 6%, var(--surface)); box-shadow: inset 0 3px 0 var(--phase); }
+.fmc-group[class*="phase-"] { padding-top: 5px; }
+.fm-group[class*="phase-"] .fm-phase, .fmc-group[class*="phase-"] .fmc-phase { color: var(--phase); }
+[class*="phase-"] .fm-node.here, [class*="phase-"] .fmc-step.here, [class*="phase-"] .fmc-count.here { border-color: var(--phase); box-shadow: 0 0 0 3px color-mix(in srgb, var(--phase) 18%, transparent); }
+/* the page header: "SELECT · STEP 7 OF 9" above the title */
+.kicker { display: flex; align-items: center; gap: 8px; margin-top: 4px; font: 700 13px/1.2 var(--label); letter-spacing: .08em; text-transform: uppercase; color: var(--phase, var(--muted)); }
+.kicker i { width: 10px; height: 10px; border-radius: 2px; background: var(--phase, var(--muted)); flex: none; }
