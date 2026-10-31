@@ -253,10 +253,10 @@ function renderMetrics() {
 
 function renderDevButton() {
   const b = $("#btnDev");
-  b.textContent = S.dev_mode ? "🛠 Developer mode: on — switch off" : "🛠 Developer mode…";
+  (b.querySelector(".lbl") ?? b).textContent = S.dev_mode ? "Developer mode: on — switch off" : "Developer mode…";   // the word only: the icon stays
   b.classList.toggle("dev-on", !!S.dev_mode);
   const sb = $("#btnSettings");                       // the state stays visible while the menu is closed
-  sb.textContent = S.dev_mode ? "⚙ Settings · dev mode on" : "⚙ Settings";
+  (sb.querySelector(".lbl") ?? sb).textContent = S.dev_mode ? "Settings · dev mode on" : "Settings";
   sb.classList.toggle("dev-on", !!S.dev_mode);
   b.title = S.dev_mode ? "Developer mode is on: locked parts (protocol, criteria, charting form) can be edited without amendments; edits are still noted in the timeline. Click to switch off."
     : "Developer mode: lift the protocol locks while you develop the review. Edits are still noted in the timeline.";

@@ -23,7 +23,7 @@ $("#btnGlossary").onclick = openGlossary;
 $("#btnClaude").onclick = openClaudeGuide;
 $("#btnTimeline").onclick = openTimeline;
 $("#btnKeys").onclick = openKeys;
-const showSingleKeys = () => { const b = $("#btnSingleKeys"); b.textContent = `⌨ Single-key shortcuts: ${singleKeys.on() ? "on" : "off"}`; b.setAttribute("aria-pressed", String(singleKeys.on())); };
+const showSingleKeys = () => { const b = $("#btnSingleKeys"); (b.querySelector(".lbl") ?? b).textContent = `Single-key shortcuts: ${singleKeys.on() ? "on" : "off"}`; b.setAttribute("aria-pressed", String(singleKeys.on())); };
 $("#btnSingleKeys").onclick = () => { singleKeys.set(!singleKeys.on()); showSingleKeys(); };
 showSingleKeys();
 $("#btnScr").onclick = () => openChecklist();

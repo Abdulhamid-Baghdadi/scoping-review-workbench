@@ -30,6 +30,9 @@
   --ok: var(--include); --ok-bg: var(--include-bg); --warn: var(--unsure); --warn-bg: var(--unsure-bg); --bad: var(--exclude); --bad-bg: var(--exclude-bg);
   /* the five phases of a review, always shown with the phase's name */
   --plan: #2340a8; --find: #0c4a6e; --select: #6d28d9; --chart: #9a3412; --report: #4d4d33;
+  /* the phase pictures (web/art/phase-pictures.js): the deep phase colour and light line art, in both themes */
+  --plan-art: #2340a8; --find-art: #0c4a6e; --select-art: #6d28d9; --chart-art: #9a3412; --report-art: #4d4d33;
+  --art-ink: #f8fafc; --art-dim: #f8fafc99; --art-acc: #fcd34d;
   /* text on a filled status colour (toasts, done dots); the edge of a text field (WCAG 1.4.11: ≥ 3:1) */
   --on-status: #ffffff; --field-border: #7c8599;
   --info: #0369a1; --info-bg: #e6f2fa; --shadow: 0 1px 2px rgba(20, 25, 34, .08), 0 6px 20px rgba(20, 25, 34, .06);
@@ -781,6 +784,9 @@ details.savedin .files { display: flex; flex-wrap: wrap; gap: 6px; }
 [class*="phase-"] .fm-node.here, [class*="phase-"] .fmc-step.here, [class*="phase-"] .fmc-count.here { border-color: var(--phase); box-shadow: 0 0 0 3px color-mix(in srgb, var(--phase) 18%, transparent); }
 /* the page header: "SELECT · STEP 7 OF 9" above the title */
 .kicker { display: flex; align-items: center; gap: 8px; margin-top: 4px; font: 700 13px/1.2 var(--label); letter-spacing: .08em; text-transform: uppercase; color: var(--phase, var(--muted)); }
+/* our own icons (web/art/icons.js), always beside their word */
+.icon { width: 16px; height: 16px; flex: none; vertical-align: -3px; }
+.btn .icon { margin-right: 1px; }
 .kicker i { width: 10px; height: 10px; border-radius: 2px; background: var(--phase, var(--muted)); flex: none; }
 
 /* ---------- screening: the record as a card, a stamp for each decision ---------- */

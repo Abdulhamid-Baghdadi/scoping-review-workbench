@@ -8,10 +8,29 @@ import { Backend } from "../../src/ui/backend.js";
 import { $, button, el, remember, say } from "./dom.js";
 import { openReview } from "./open-review.js";
 import { folderStripHtml } from "../art/folder-pictures.js";
+import { iconSvg } from "../art/icons.js";
+import { phasePictureSvg } from "../art/phase-pictures.js";
 
 // "Your review is a folder": the same pictures as on the Homepage, for visitors who see only this screen
 // (while the app loads, or in a browser that cannot open folders)
 document.getElementById("startFolder")?.insertAdjacentHTML("beforeend", folderStripHtml());
+
+// The icons of the page's fixed buttons (index.html: data-icon="…"), in front of their word, once at start; the
+// studio later changes only a button's word (.lbl), so its icon stays.
+for (const b of document.querySelectorAll("[data-icon]")) b.insertAdjacentHTML("afterbegin", iconSvg(b.dataset.icon));
+
+/** The phases of a new review, each with its picture and its steps: "How a review goes" on the start screen. */
+function phaseCards() {
+  const type = stages.REVIEW_TYPES[stages.NEW_REVIEW_TYPE], phases = [...new Set(type.steps.map(st => st.phase))];
+  $("#startFlow")?.replaceChildren(...phases.map(p => {
+    const card = el("li", { className: `phase-card phase-${p.toLowerCase()}` });
+    card.insertAdjacentHTML("afterbegin", phasePictureSvg(p));
+    card.append(el("span", { className: "phase-name" }, p),
+      el("span", { className: "phase-steps" }, type.steps.filter(st => st.phase === p).map(st => st.title).join(" · ")));
+    return card;
+  }));
+}
+phaseCards();
 
 /** The steps of a review in the start screen's sidebar; clicking one shows what it is for. */
 export function startSteps() {

@@ -28,9 +28,9 @@
       <p class="start-side-note">The steps of every review. They open once a review folder is open.</p>
       <nav class="stepper" id="startSteps" aria-label="Steps of a review"></nav>
       <div class="start-side-foot">
-        <button class="btn sm ghost" id="startTheme" type="button">🌓 Light / dark</button>
-        <button class="btn sm ghost" id="startInstall" type="button" title="Install it as a desktop app that works offline">⬇ Install as an app</button>
-        <a class="btn sm ghost" href="https://github.com/Abdulhamid-Baghdadi/scoping-review-workbench/releases/latest/download/scoping-review-workbench.zip" title="The app as a ZIP with launchers for Windows, Mac and Linux, to run it on your own computer (needs Node.js)">💾 Download (Windows, Mac, Linux)</a>
+        <button class="btn sm ghost" id="startTheme" type="button" data-icon="theme"><span class="lbl">Light / dark</span></button>
+        <button class="btn sm ghost" id="startInstall" type="button" title="Install it as a desktop app that works offline" data-icon="install"><span class="lbl">Install as an app</span></button>
+        <a class="btn sm ghost" href="https://github.com/Abdulhamid-Baghdadi/scoping-review-workbench/releases/latest/download/scoping-review-workbench.zip" title="The app as a ZIP with launchers for Windows, Mac and Linux, to run it on your own computer (needs Node.js)" data-icon="download"><span class="lbl">Download (Windows, Mac, Linux)</span></a>
         <a class="btn sm ghost" href="https://github.com/Abdulhamid-Baghdadi/scoping-review-workbench" target="_blank" rel="noopener">GitHub ↗</a>
       </div>
     </aside>
@@ -43,14 +43,15 @@
       </div>
       <div class="start-stage" id="startStage" hidden></div>
       <div class="start-features">
-        <div class="card feature"><div class="ficon">🔒</div><h2>Your files, your PC</h2><p>Plain Markdown, CSV and PDFs in a folder you choose. No account, no upload. Opens in Obsidian too.</p></div>
-        <div class="card feature"><div class="ficon">🧭</div><h2>Guided, reproducible</h2><p>Locked protocol with logged amendments, coded exclusion reasons, a decision log and a dated timeline.</p></div>
-        <div class="card feature"><div class="ficon">🤖</div><h2>AI only if you want it</h2><p>Claude can pre-screen, fetch PDFs or prefill charting. It only suggests; you confirm every decision.</p></div>
+        <div class="card feature"><div class="ficon" data-icon="lock"></div><h2>Your files, your PC</h2><p>Plain Markdown, CSV and PDFs in a folder you choose. No account, no upload. Opens in Obsidian too.</p></div>
+        <div class="card feature"><div class="ficon" data-icon="compass"></div><h2>Guided, reproducible</h2><p>Locked protocol with logged amendments, coded exclusion reasons, a decision log and a dated timeline.</p></div>
+        <div class="card feature"><div class="ficon" data-icon="assist"></div><h2>AI only if you want it</h2><p>Claude can pre-screen, fetch PDFs or prefill charting. It only suggests; you confirm every decision.</p></div>
       </div>
       <div class="card start-folder" id="startFolder"><h2>Your review is a folder on your PC</h2><p class="sub">Every paper is a plain Markdown note, so the folder opens in Obsidian (or any text editor) as it is. In Obsidian: Open folder as vault.</p></div>
-      <div class="start-flow" aria-label="The review in five steps">
-        <span>Plan</span><i>→</i><span>Search</span><i>→</i><span>Screen</span><i>→</i><span>Chart</span><i>→</i><span>Report</span>
-      </div>
+      <section class="start-flow" aria-labelledby="startFlowH">   <!-- the phases of a review, each with its picture (start-screen.js) -->
+        <h2 id="startFlowH">How a review goes</h2>
+        <ol class="phase-cards" id="startFlow"></ol>
+      </section>
     </section>
   </main>
 
@@ -67,20 +68,20 @@
           </div>
           <span class="draft-bar" id="draftBar" hidden></span>
           <span class="spacer"></span>
-          <button class="btn sm ghost" id="btnTimeline" title="Every dated event of this review (T)">🕘 Timeline</button>
-          <button class="btn sm ghost" id="btnScr" title="The reporting checklist of this review (PRISMA-ScR)">☑ Checklist</button>
-          <button class="btn sm ghost" id="btnClaude" title="How to use Claude (or another AI assistant) with this review">🤖 Claude</button>
+          <button class="btn sm ghost" id="btnTimeline" title="Every dated event of this review (T)" data-icon="timeline"><span class="lbl">Timeline</span></button>
+          <button class="btn sm ghost" id="btnScr" title="The reporting checklist of this review (PRISMA-ScR)" data-icon="checklist"><span class="lbl">Checklist</span></button>
+          <button class="btn sm ghost" id="btnClaude" title="How to use Claude (or another AI assistant) with this review" data-icon="assist"><span class="lbl">Claude</span></button>
           <div class="menu-wrap">
-            <button class="btn sm ghost" id="btnSettings" aria-haspopup="true" aria-expanded="false">⚙ Settings</button>
+            <button class="btn sm ghost" id="btnSettings" aria-haspopup="true" aria-expanded="false" data-icon="settings"><span class="lbl">Settings</span></button>
             <div class="popmenu" id="settingsMenu" hidden>
-              <button class="btn ghost" id="btnReviewSettings">📁 Review settings…</button>
-              <button class="btn ghost" id="btnGlossary" title="Terms used in the review (G)">📖 Glossary</button>
-              <button class="btn ghost" id="btnKeys" title="Keyboard shortcuts">⌨ Keyboard shortcuts</button>
-              <button class="btn ghost" id="btnSingleKeys" aria-pressed="true" title="Letter and number shortcuts (G, T, I, U, E, 1–9 …). Switch them off if they get in the way, e.g. with speech input.">⌨ Single-key shortcuts: on</button>
-              <button class="btn ghost" id="btnTheme">🌓 Light / dark</button>
-              <button class="btn ghost" id="btnInstall" title="Install it as a desktop app that works offline">⬇ Install as an app</button>
-              <a class="btn ghost" href="https://github.com/Abdulhamid-Baghdadi/scoping-review-workbench/releases/latest/download/scoping-review-workbench.zip" title="The app as a ZIP with launchers for Windows, Mac and Linux, to run it on your own computer (needs Node.js)">💾 Download for Windows, Mac, Linux</a>
-              <button class="btn ghost" id="btnDev">🛠 Developer mode</button>
+              <button class="btn ghost" id="btnReviewSettings" data-icon="folder"><span class="lbl">Review settings…</span></button>
+              <button class="btn ghost" id="btnGlossary" title="Terms used in the review (G)" data-icon="glossary"><span class="lbl">Glossary</span></button>
+              <button class="btn ghost" id="btnKeys" title="Keyboard shortcuts" data-icon="keys"><span class="lbl">Keyboard shortcuts</span></button>
+              <button class="btn ghost" id="btnSingleKeys" aria-pressed="true" title="Letter and number shortcuts (G, T, I, U, E, 1–9 …). Switch them off if they get in the way, e.g. with speech input." data-icon="keys"><span class="lbl">Single-key shortcuts: on</span></button>
+              <button class="btn ghost" id="btnTheme" data-icon="theme"><span class="lbl">Light / dark</span></button>
+              <button class="btn ghost" id="btnInstall" title="Install it as a desktop app that works offline" data-icon="install"><span class="lbl">Install as an app</span></button>
+              <a class="btn ghost" href="https://github.com/Abdulhamid-Baghdadi/scoping-review-workbench/releases/latest/download/scoping-review-workbench.zip" title="The app as a ZIP with launchers for Windows, Mac and Linux, to run it on your own computer (needs Node.js)" data-icon="download"><span class="lbl">Download for Windows, Mac, Linux</span></a>
+              <button class="btn ghost" id="btnDev" data-icon="developer"><span class="lbl">Developer mode</span></button>
             </div>
           </div>
         </nav>

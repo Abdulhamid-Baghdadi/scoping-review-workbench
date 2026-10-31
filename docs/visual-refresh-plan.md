@@ -1,7 +1,9 @@
 # Visual refresh: plan
 
-Status: steps 1–3 (fonts, tokens, type) 4 (journey map and page header) and 5 (screening) done on 31 October 2026, screenshots in
-[visual-refresh/after-steps-1-3/](visual-refresh/after-steps-1-3/); steps 6–10 still to do. Step 5 departs from the
+Status: steps 1–3 (fonts, tokens, type) 4 (journey map and page header), 5 (screening) and 6 (pictures and icons) done on 31 October 2026, screenshots in
+[visual-refresh/after-steps-1-3/](visual-refresh/after-steps-1-3/); steps 7–10 still to do. Step 6 drew the five
+phase pictures (`web/art/phase-pictures.js`, shown on the start screen) and the icons of the toolbar, the Settings
+menu and the start screen (`web/art/icons.js`); emoji inside the pages remain for step 9. Step 5 departs from the
 mock-up in one place: the stamp lands on the last-decision line under the record, not on the record, because the next
 record replaces it at once and no key may wait for an animation. On a phone the exclusion reasons show only while
 one is being chosen. The screenshots (7.5 MB) stay on the author's PC and are not in the repository, so the
