@@ -3,8 +3,8 @@
  * @module web/studio/shell/help
  */
 import { $, h, singleKeys } from "../core/dom.js";
-import { H, S, SC } from "../core/state.js";
-import { go, stage, stageName, stepOf } from "./navigation.js";
+import { H, HOME, S, SC } from "../core/state.js";
+import { afterGo, go, stage, stageName, stepOf } from "./navigation.js";
 import { btn, copy, hlQuery, iconBtn, openNote, pill } from "../ui/components.js";
 import { modal, restoreFocus } from "../ui/dialogs.js";
 
@@ -81,6 +81,12 @@ export function closeHelp() {
   if (hadFocus) restoreFocus(drawerOpener);
   drawerOpener = null;
 }
+
+// An open drawer follows the page: after a move it shows the new page's help, or its example.
+afterGo.add(key => {
+  const dr = $("#drawer");
+  if (dr.classList.contains("open") && key !== HOME) (dr.querySelector("h2").textContent.startsWith("Example") ? openExample : openHelp)(key);
+});
 
 // "Working with Claude": how to use an AI assistant with this review. The per-step part comes from the same
 // settings as the AI assistance cards (review_stages.AI_STEPS), so it stays in step with the tool.

@@ -20,10 +20,5 @@
     {"name": "studio app", "files": ["web/studio/*.js"], "uses": ["studio pages", "studio shell", "studio ui", "studio core"], "packages": ["pdfjs", "pdfjs/worker"]},
     {"name": "boot", "files": ["web/*.js", "web/start/**/*.js", "!web/sw.js", "!web/install.js"], "uses": ["public API", "engine ui", "art", "studio app"], "packages": ["pdfjs", "pdfjs/worker"]}
   ],
-  "allow": [
-    {"from": "web/studio/shell/navigation.js", "to": "web/studio/shell/chrome.js", "why": "Open, to be fixed: navigation redraws with chrome's render(), and chrome uses navigation, a cycle. To be inverted through a port app.js connects, as core/api.js redraws."},
-    {"from": "web/studio/shell/reviews.js", "to": "web/studio/shell/chrome.js", "why": "Open, to be fixed: reviews redraws with chrome's render(), and chrome uses reviews, a cycle. To be inverted the same way."},
-    {"from": "web/studio/shell/journey-map.js", "to": "web/studio/shell/chrome.js", "why": "Open, to be fixed: the journey map redraws with chrome's render() and takes its aiMark(), and chrome draws the journey map, a cycle. To be inverted the same way."},
-    {"from": "web/studio/shell/navigation.js", "to": "web/studio/shell/help.js", "why": "Open, to be fixed: navigation opens help and the example, and help uses navigation's go(), a cycle. To be inverted the same way."}
-  ]
+  "allow": []
 }

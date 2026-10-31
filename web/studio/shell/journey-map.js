@@ -2,13 +2,21 @@
  * The journey map at the top of every page: planning steps, the PRISMA flow boxes with live counts, analysis.
  * @module web/studio/shell/journey-map
  */
+import { view } from "../core/api.js";
 import { h, store } from "../core/dom.js";
 import { CUR, HOME, S, SC } from "../core/state.js";
-import { aiMark, render } from "./chrome.js";
 import { go, goStep, stepOptional, stepStages, stepStatus } from "./navigation.js";
 import { flowDiagram } from "../ui/charts.js";
 import { iconBtn } from "../ui/components.js";
 import { modal } from "../ui/dialogs.js";
+
+/** "AI" next to a step where AI can help: grey while off, in the accent colour when the review switched it on. */
+export function aiMark(keys) {
+  const steps = [keys].flat().filter(k => S.ai?.steps[k]);
+  if (!steps.length) return null;
+  const on = steps.some(k => (S.ai.modes[k] || "off") !== "off");
+  return h("span", { class: "ai-mark" + (on ? " on" : ""), title: on ? "AI assistance is on here" : "AI can help here (off; switch it on in the AI assistance card)" }, "AI");
+}
 
 // One row at the top of every page: the planning steps, then the boxes of the PRISMA flow diagram with their live
 // counts (identification, screening, included), then the analysis steps and the report. Each box opens its step;
@@ -49,7 +57,7 @@ function flowGroups() {
 /** The map: folded to one slim line (numbered dots and the PRISMA counts) or unfolded; the choice is remembered. */
 export function flowMap() {
   const groups = flowGroups(), here = flowHere(), open = store.get("map_open", "") === "1";
-  const toggle = () => { store.set("map_open", open ? "" : "1"); render(); };
+  const toggle = () => { store.set("map_open", open ? "" : "1"); view.render(); };
   const full = () => modal({ title: "PRISMA flow diagram", wide: true,
     body: h("div", {}, h("p", { class: "muted", style: "margin-top:0" }, "Live from your records; the box you are working on is highlighted."), flowDiagram(S.flow, here ?? undefined)) });
   const arrow = () => h("span", { class: "fm-arrow", "aria-hidden": "true" }, "→");

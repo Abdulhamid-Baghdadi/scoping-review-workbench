@@ -2,11 +2,10 @@
  * Switching reviews: the draft, the finished example, saving a copy to a folder.
  * @module web/studio/shell/reviews
  */
-import { api, backend, busy, getJSON } from "../core/api.js";
+import { api, backend, busy, getJSON, view } from "../core/api.js";
 import { flushSaves, SAVE_STATE } from "../core/autosave.js";
 import { $, h, store } from "../core/dom.js";
 import { CUR, D, HOME, S, SC, setCur, setReview, setS } from "../core/state.js";
-import { render } from "./chrome.js";
 import { go } from "./navigation.js";
 import { btn } from "../ui/components.js";
 import { confirmBox, modal, promptText, toast } from "../ui/dialogs.js";
@@ -81,6 +80,6 @@ export async function switchReview(name) {
     for (const k of Object.keys(D)) delete D[k];
     SC.id = null; SC.cache = {};
     if (CUR !== HOME && !S.stages.find(s => s.key === CUR)) setCur(HOME);
-    render();
+    view.render();
   } catch (e) { toast(e.message, "err"); }
 }

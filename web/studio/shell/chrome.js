@@ -14,14 +14,6 @@ import { btn, copy, iconBtn, libraryName, openNote, pill, segmented, statusKind 
 import { confirmBox, toast } from "../ui/dialogs.js";
 import { aiStrip } from "../ui/ai-strip.js";
 
-/** "AI" next to a step where AI can help: grey while off, in the accent colour when the review switched it on. */
-export function aiMark(keys) {
-  const steps = [keys].flat().filter(k => S.ai?.steps[k]);
-  if (!steps.length) return null;
-  const on = steps.some(k => (S.ai.modes[k] || "off") !== "off");
-  return h("span", { class: "ai-mark" + (on ? " on" : ""), title: on ? "AI assistance is on here" : "AI can help here (off; switch it on in the AI assistance card)" }, "AI");
-}
-
 /** A review's name as people say it: "My review" (the draft), "Example review", or the folder's name. */
 const reviewLabel = r => r.startsWith("📘") ? "Example review" : r === S.reviews[0] ? "My review" : r.split(/[\\/]/).pop().replace(/ records$/, "");
 

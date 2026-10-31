@@ -2,13 +2,15 @@
  * Steps, stages and tabs: which page is on screen, and going to another one.
  * @module web/studio/shell/navigation
  */
-import { api } from "../core/api.js";
+import { api, view } from "../core/api.js";
 import { flushSaves } from "../core/autosave.js";
 import { $, store } from "../core/dom.js";
 import { CUR, HOME, PART, S, SC, setCur } from "../core/state.js";
-import { render } from "./chrome.js";
-import { openExample, openHelp } from "./help.js";
 import { promptText } from "../ui/dialogs.js";
+
+/** What runs after each move to another page, given its key: the shell modules that follow the page add to it (help
+ *  keeps an open drawer on the page), so navigation, which they use, does not import them. */
+export const afterGo = new Set();
 
 // The sidebar shows steps (src/domain/review-types.js): plain-language groups of stages. A step with more than
 // one tab shows its stages as tabs at the top of the page. Statuses, files and links (#questions) stay per stage.
@@ -67,7 +69,7 @@ export function goStep(st) {
   goTab(st.tabs.find(t => `${t.stage}:${t.part ?? ""}` === last) ?? st.tabs[0]);
 }
 
-export function go(key) { flushSaves(); setCur(key); store.set("stage", key); if (key !== HOME) store.set("last_stage", key); if (key !== HOME) { const st = stepOf(key), t = curTab(); if (st && t) store.set("tab_" + st.key, `${t.stage}:${t.part ?? ""}`); } history.replaceState(null, "", "#" + key); render(); $("#main").scrollTo({ top: 0 }); const dr = $("#drawer"); if (dr.classList.contains("open") && key !== HOME) (dr.querySelector("h2").textContent.startsWith("Example") ? openExample : openHelp)(key); }
+export function go(key) { flushSaves(); setCur(key); store.set("stage", key); if (key !== HOME) store.set("last_stage", key); if (key !== HOME) { const st = stepOf(key), t = curTab(); if (st && t) store.set("tab_" + st.key, `${t.stage}:${t.part ?? ""}`); } history.replaceState(null, "", "#" + key); view.render(); $("#main").scrollTo({ top: 0 }); for (const after of afterGo) after(key); }
 
 export async function skipStage(key = CUR) {
   const r = await promptText("Skip this part", "Skipping is fine for optional parts, but the reason is reported in the timeline and the reporting checklist.", "e.g. not planned in the protocol", true, "", "Skip this part");
