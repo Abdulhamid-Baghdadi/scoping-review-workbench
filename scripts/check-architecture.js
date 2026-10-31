@@ -12,7 +12,7 @@ import { fileURLToPath } from "node:url";
 
 const FORMAT = "design-rules architecture";
 const KEYS = new Set(["format", "version", "name", "about", "reader", "sources", "layers", "allow"]);
-const LAYER_KEYS = new Set(["name", "files", "uses", "packages", "forbid"]);
+const LAYER_KEYS = new Set(["name", "why", "files", "uses", "packages", "forbid"]);
 const IDENT = "[A-Za-z_$][\\w$]*";
 
 /** The text with comments, the insides of strings and regular expression literals blanked, every position and line

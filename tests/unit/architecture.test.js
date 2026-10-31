@@ -117,6 +117,11 @@ test("a key the check does not hold is an error saying what to do, not ignored",
                 /domain layer may use "nope", which is no layer's name/);
 });
 
+test("a layer's why is words for readers: accepted, nothing checked", () => {
+  const layers = LAYERS.map(layer => ({ ...layer, why: "what the layer is for" }));
+  assert.deepEqual(project({}, { layers }).found, []);
+});
+
 test("code only: comments and the insides of strings blanked, positions kept, template code kept", () => {
   const text = "const a = 'x'; // y\nconst t = `a${b}c`; /* z */ const r = /re/g;";
   const code = codeOnly(text);
