@@ -27,4 +27,4 @@ createServer(async (req, res) => {
   } catch {
     res.writeHead(url.pathname === "/" ? 302 : 404, url.pathname === "/" ? { Location: "/web/" } : {}).end();
   }
-}).listen(PORT, () => console.log(`Scoping Review Workbench: http://localhost:${PORT}/web/`));
+}).listen(PORT, "127.0.0.1", () => console.log(`Scoping Review Workbench: http://localhost:${PORT}/web/`));   // this computer only, not the network
