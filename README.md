@@ -2,15 +2,29 @@
 
 **A workbench for scoping reviews, reported to PRISMA-ScR, that runs in your browser and keeps every review in a folder on your own PC. The methods follow the JBI Manual and Arksey & O'Malley. It covers the review from the first idea to the charted evidence and the report; analyse the charted data further in the tools your field uses.**
 
+![Screening three records by keyboard: I includes the first, E then 1 excludes the second with reason E1, U marks the third unsure; after each decision a stamp with its word appears under the record and the next record slides in](docs/readme/screening.gif)
+
+*Screening by keyboard, with made-up example papers. The animation plays once.*
+
 **[▶ Open it in your browser](https://abdulhamid-baghdadi.github.io/scoping-review-workbench/)** · **[💾 Download for Windows, Mac and Linux](https://github.com/Abdulhamid-Baghdadi/scoping-review-workbench/releases/latest/download/scoping-review-workbench.zip)** · Chrome or Edge on a computer
 
 Scoping Review Workbench walks you through a scoping review from the first idea to the PRISMA flow diagram: questions, search strings, protocol, database imports, screening, full texts, charting and the report. Your review is a plain folder of Markdown notes, CSV tables and PDFs: nothing is uploaded, there is no account, and the folder opens in Obsidian or any text editor.
 
-![Scoping Review Workbench: screening a record, with the map of the review's steps and the PRISMA flow at the top](docs/screenshot.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/readme/screening-dark.png">
+  <img src="docs/readme/screening-light.png" alt="The screening page: the map of the review's phases at the top, a record as a card with its search terms highlighted in the abstract, the include, unsure and exclude buttons under it, and the queue of records beside it">
+</picture>
 
-*Screening in Scoping Review Workbench (example data). Search terms are highlighted in the abstract; I / U / E decide.*
+*Screening (made-up example papers), in your light or dark theme. Search terms are highlighted in the abstract; I / U / E decide.*
 
-![The app tour highlighting the steps](docs/tour.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/readme/home-dark.png">
+  <img src="docs/readme/home-light.png" alt="The Homepage: the title beside three of the review's records fanned out like cards, the review's counts, one Continue button, and the five phases of the review as cards with their pictures">
+</picture>
+
+*The Homepage: where your review stands, phase by phase.*
+
+![The app tour at its second step, highlighting the map of the review's steps](docs/readme/tour.png)
 
 *The 1-minute app tour, started from the Homepage.*
 
@@ -159,7 +173,7 @@ npm test                 # unit tests
 npm run check            # architecture: each layer imports only what it may
 npm run build            # the static site in dist/
 node scripts/bench-open.js "<copy of a … records folder>"   # how fast a review opens
-node scripts/readme-screenshot.js   # docs/screenshot.png and docs/tour.png, with example data (needs npm run serve)
+node scripts/readme-screenshot.js   # the README's pictures in docs/readme/, with made-up papers (needs npm run serve and ffmpeg)
 ```
 
 Every push to `main` is tested, built and published on GitHub Pages, and the download ZIP on the [latest release](https://github.com/Abdulhamid-Baghdadi/scoping-review-workbench/releases/latest) is rebuilt (`.github/workflows/pages.yml`). Review data is never part of this repository.

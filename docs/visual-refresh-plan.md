@@ -6,7 +6,9 @@ Status: steps 1–3 (fonts, tokens, type) 4 (journey map and page header), 5 (sc
 phase colour, the PCC cards three tints of Plan, the flow diagram Find, Select and Include, and drawn icons replace
 the emoji in the pages (the smoke test now fails on an emoji in a page's text). Left out of step 9 on purpose:
 database names and charting field names in capitals (long names read worse in capitals) and the charting paper list
-as cards. Step 10 still to do. The Homepage's card fan
+as cards. Step 10 done: the README's pictures are made again by `scripts/readme-screenshot.js` (`docs/readme/`:
+a screening GIF under 5 s that plays once, and the screening page, the Homepage and the tour, light and dark), a test
+holds them, and the UI audit is `docs/ui-audit-2026-10-31.md`. The refresh is complete. The Homepage's card fan
 shows three of the review's own decided records (none are made up); before there are any, it shows the picture of the
 phase the review is in. Its phase cards are titled "Your review, phase by phase", since the walk-through below keeps
 "How a review goes". Step 6 drew the five

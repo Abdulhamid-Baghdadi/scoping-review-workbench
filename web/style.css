@@ -657,7 +657,7 @@ details.savedin .files { display: flex; flex-wrap: wrap; gap: 6px; }
 .fmc-dot.skipped { border-style: dashed; }
 .fmc-dot.here { box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px var(--accent); }
 /* a step on the map: the same box as the PRISMA counts, with its status dot inside */
-.fmc-step { display: inline-flex; align-items: center; gap: 5px; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 7px; padding: 1px 8px 1px 3px; font: inherit; font-size: 12px; cursor: pointer; }
+.fmc-step { display: inline-flex; align-items: center; gap: 5px; min-height: 24px; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 7px; padding: 1px 8px 1px 3px; font: inherit; font-size: 12px; cursor: pointer; }   /* 24 px: WCAG 2.5.8 */
 .fmc-step .fmc-dot { width: 18px; height: 18px; font-size: 10px; }
 .fmc-step:hover { border-color: var(--accent); }
 .fmc-step:hover .fmc-name { color: var(--text); }
@@ -666,7 +666,7 @@ details.savedin .files { display: flex; flex-wrap: wrap; gap: 6px; }
 .fmc-group.single .fmc-phase { display: none; }            /* a one-step group: its step's name says it */
 @media (max-width: 1700px) { .fmc-name { display: none; } .fmc-step { padding: 1px 3px; } }
 @media (min-width: 1251px) and (max-width: 1700px) { .fmc-group.single .fmc-phase { display: inline; } }
-.fmc-count { display: inline-flex; align-items: baseline; gap: 5px; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 7px; padding: 1px 8px; font: inherit; font-size: 12px; cursor: pointer; }
+.fmc-count { display: inline-flex; align-items: center; gap: 5px; min-height: 24px; border: 1.5px solid var(--border); background: var(--surface); color: var(--muted); border-radius: 7px; padding: 1px 8px; font: inherit; font-size: 12px; cursor: pointer; }
 .fmc-count b { color: var(--text); font-size: 13px; }
 .fmc-count:hover { border-color: var(--accent); }
 .fmc-count.good b { color: var(--ok); }
@@ -819,13 +819,13 @@ button.phase-card:hover { transform: translateY(-2px); box-shadow: var(--shadow)
 /* each step page's cards carry its phase's colour on their top edge (#page.phase-…, set by render()) */
 #page[class*="phase-"] .card:not(.empty) { box-shadow: inset 0 3px 0 var(--phase), var(--shadow); }
 
-/* our own icons (web/art/icons.js), always beside their word */
-.icon { width: 16px; height: 16px; flex: none; vertical-align: -3px; }
-.btn .icon { margin-right: 1px; }
-.pill .icon { width: 13px; height: 13px; vertical-align: -2px; }
-.empty .big .icon { width: 44px; height: 44px; color: var(--muted); }
-.rb-icon .icon, .popmenu .icon, .file .icon { width: 15px; height: 15px; }
-.demo-lbl .icon, .demo-who .icon { width: 14px; height: 14px; vertical-align: -2px; }
+/* our own icons (web/art/icons.js), always beside their word; svg.icon, because .btn.icon is an icon-only button */
+svg.icon { width: 16px; height: 16px; flex: none; vertical-align: -3px; }
+.btn svg.icon { margin-right: 1px; }
+.pill svg.icon { width: 13px; height: 13px; vertical-align: -2px; }
+.empty .big svg.icon { width: 44px; height: 44px; color: var(--muted); }
+.rb-icon svg.icon, .popmenu svg.icon, .file svg.icon { width: 15px; height: 15px; }
+.demo-lbl svg.icon, .demo-who svg.icon { width: 14px; height: 14px; vertical-align: -2px; }
 .kicker i { width: 10px; height: 10px; border-radius: 2px; background: var(--phase, var(--muted)); flex: none; }
 
 /* ---------- screening: the record as a card, a stamp for each decision ---------- */
