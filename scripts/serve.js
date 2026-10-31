@@ -8,7 +8,7 @@ import { extname, join, normalize, resolve } from "node:path";
 const ROOT = resolve(import.meta.dirname, "..");
 const PORT = Number(process.argv[2] || process.env.PORT || 8770);
 const TYPES = { ".html": "text/html", ".js": "text/javascript", ".mjs": "text/javascript", ".css": "text/css", ".json": "application/json",
-  ".md": "text/markdown; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".wasm": "application/wasm", ".map": "application/json" };
+  ".md": "text/markdown; charset=utf-8", ".svg": "image/svg+xml", ".png": "image/png", ".wasm": "application/wasm", ".map": "application/json", ".woff2": "font/woff2" };
 
 createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");

@@ -1,5 +1,5 @@
 /* Start screen: the app's own layout (stages in the sidebar) with a welcome page in the main column */
-.start { display: grid; grid-template-columns: 284px minmax(0, 1fr); height: 100vh; background: var(--bg); }
+.start { display: grid; grid-template-columns: 284px minmax(0, 1fr); height: 100vh; }   /* the page's grid shows through */
 .start[hidden], .app[hidden] { display: none; }
 
 .start-side-note { margin: 0 18px 4px; font-size: 12.5px; color: var(--faint); }
@@ -9,14 +9,10 @@
 .start-side-foot { display: flex; gap: 6px; padding: 10px 14px 14px; border-top: 1px solid var(--border); flex-wrap: wrap; }
 .start-side-foot a.btn { text-decoration: none; }
 
-.start-main { overflow: auto; min-width: 0; padding: 56px clamp(16px, 5vw, 64px) 40px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-content: start;
-  background:
-    radial-gradient(900px 420px at 85% -10%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
-    radial-gradient(700px 360px at 0% 0%, color-mix(in srgb, #06b6d4 10%, transparent), transparent 70%),
-    var(--bg); }
+.start-main { overflow: auto; min-width: 0; padding: 56px clamp(16px, 5vw, 64px) 40px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; align-content: start; }
 .start-hero { max-width: 760px; display: grid; gap: 14px; justify-items: start; }
-.start-hero h1 { font-size: clamp(30px, 4.4vw, 46px); line-height: 1.08; letter-spacing: -.02em; margin: 4px 0 0; }
-.start-hero .grad { background: linear-gradient(90deg, var(--accent), #06b6d4); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.start-hero h1 { font: 800 clamp(32px, 5vw, 54px)/1.02 var(--display); letter-spacing: -.03em; margin: 4px 0 0; }
+.start-hero .grad { color: var(--accent); }
 .start-hero .lead { font-size: 16.5px; color: var(--muted); margin: 0; max-width: 660px; }
 #startBody { display: grid; gap: 14px; width: 100%; margin-top: 6px; }
 .start-actions { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -25,7 +21,7 @@
 .start-msg .err { color: var(--bad); }
 
 .recents { display: grid; gap: 8px; max-width: 560px; }
-.recents h2 { margin: 0; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
+.recents h2 { margin: 0; font: 700 13px/1.2 var(--label); letter-spacing: .08em; text-transform: uppercase; color: var(--faint); }
 .recent { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 8px 8px 8px 14px; box-shadow: var(--shadow); }
 .recent .name { font-weight: 650; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 

@@ -152,7 +152,7 @@ How to use it: open the app's folder (the download, or a clone of this repositor
 
 Run from a clone with `npm install` and `npm run serve` (then open http://localhost:8770/web/), or with the launchers above.
 
-Plain JavaScript (ES modules), no framework and no bundler; the only dependency is [pdf.js](https://mozilla.github.io/pdf.js/) for reading PDFs. The code is split into layers (domain rules, ports, services, adapters, UI). See [ARCHITECTURE.md](ARCHITECTURE.md).
+Plain JavaScript (ES modules), no framework and no bundler; the only dependency is [pdf.js](https://mozilla.github.io/pdf.js/) for reading PDFs. The fonts (Bricolage Grotesque, Barlow Condensed, IBM Plex Sans and Mono) are served from `web/fonts/` under the SIL Open Font Licence 1.1, so the app looks the same offline. The code is split into layers (domain rules, ports, services, adapters, UI). See [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ```
 npm test                 # unit tests

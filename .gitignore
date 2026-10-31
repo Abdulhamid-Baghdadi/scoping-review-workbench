@@ -6,3 +6,5 @@ dist/
 video-media/
 !web/example/full-texts/*.pdf
 build/
+# screenshots of the visual refresh: kept on this PC, too heavy for the public repository
+docs/visual-refresh/**/*.jpg

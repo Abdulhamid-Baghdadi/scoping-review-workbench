@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en-GB" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Visual refresh mock-up</title>
+<!-- Mock-up only: the real app would serve these fonts from web/fonts/ so it keeps working offline (plan, step 1). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Barlow+Condensed:wght@600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+/* Proposed tokens (docs/visual-refresh-plan.md, "Tokens and fonts"). Every colour has one meaning. */
+:root {
+  --bg: #EEF1F4; --grid: rgba(35, 64, 168, .06); --surface: #FFFFFF; --surface-2: #F5F7FA; --border: #D5DBE3; --field-border: #7C8599;
+  --text: #141922; --muted: #596273; --accent: #2340A8; --accent-2: #E8EDFB; --accent-ink: #FFFFFF;
+  --include: #047857; --include-bg: #E3F5EE; --unsure: #8A6500; --unsure-bg: #FFF4CC; --exclude: #9F1239; --exclude-bg: #FDE7EC;
+  /* the five phases: the same colour in the map, the page header and the pictures */
+  --plan: #2340A8; --find: #0C4A6E; --select: #6D28D9; --chart: #9A3412; --report: #4D4D33;
+  /* the picture boxes keep the deep phase colour in both themes (light line art on it) */
+  --plan-art: #2340A8; --find-art: #0C4A6E; --select-art: #6D28D9; --chart-art: #9A3412; --report-art: #4D4D33;
+  --art-ink: #F8FAFC; --art-dim: rgba(248, 250, 252, .4); --art-acc: #FCD34D;
+  --shadow: 0 1px 2px rgba(20, 25, 34, .08), 0 8px 24px rgba(20, 25, 34, .07);
+  --f-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-label: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --f-body: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "IBM Plex Mono", Consolas, ui-monospace, monospace;
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --bg: #0E131A; --grid: rgba(148, 163, 184, .05); --surface: #161D27; --surface-2: #1C2531; --border: #2A3441; --field-border: #646E88;
+  --text: #E5E9EF; --muted: #98A2B1; --accent: #8AA6FF; --accent-2: #1E2742; --accent-ink: #0E131A;
+  --include: #34D399; --include-bg: #10291F; --unsure: #E8BC4A; --unsure-bg: #3A3016; --exclude: #FB7185; --exclude-bg: #3D1C24;
+  --plan: #8AA6FF; --find: #7DD3FC; --select: #C4B5FD; --chart: #FDBA74; --report: #D9D6B4;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .3);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background-color: var(--bg); color: var(--text); font: 15px/1.55 var(--f-body);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px); background-size: 24px 24px; }
+button { font: inherit; color: inherit; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+h1, h2, h3 { margin: 0; text-wrap: balance; }
+.label { font: 700 12.5px/1.2 var(--f-label); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.mono { font-family: var(--f-mono); font-size: 13px; }
+
+/* mock-up switcher (not part of the proposal) */
+.mock-bar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; padding: 8px 16px; background: var(--text); color: var(--bg); font-size: 13px; }
+.mock-bar button { background: transparent; border: 1px solid currentColor; border-radius: 99px; padding: 3px 12px; min-height: 28px; }
+.mock-bar button[aria-pressed="true"] { background: var(--bg); color: var(--text); }
+
+/* toolbar */
+.toolbar { display: flex; align-items: center; gap: 12px; padding: 10px 24px; border-bottom: 1px solid var(--border); background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 5; }
+.brand { display: flex; align-items: center; gap: 10px; font: 800 17px/1 var(--f-display); letter-spacing: -.01em; }
+.mark { width: 30px; height: 30px; border-radius: 8px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; }
+.toolbar .spacer { flex: 1; }
+.tbtn { background: none; border: 1px solid transparent; border-radius: 8px; padding: 6px 10px; min-height: 32px; display: inline-flex; gap: 6px; align-items: center; color: var(--text); }
+.tbtn:hover { background: var(--surface-2); }
+.tbtn svg { width: 16px; height: 16px; }
+.review-pick { white-space: nowrap; border-color: var(--border); background: var(--surface); }
+@media (max-width: 720px) { .tbtn .w { display: none; } .brand .w { display: none; } .toolbar { padding: 8px 16px; } }
+
+.wrap { max-width: 1240px; margin: 0 auto; padding: 20px 24px 120px; }
+@media (max-width: 720px) { .wrap { padding: 16px 16px 120px; } }
+
+/* journey map: the five phases as coloured segments, each with its word */
+.journey { display: grid; grid-template-columns: 4fr 1fr 4fr 1fr 1fr; gap: 6px; margin-bottom: 18px; }
+.jp { background: var(--surface); border: 1px solid var(--border); border-top: 4px solid var(--c); border-radius: 8px; padding: 5px 8px 6px; min-width: 0; }
+.jp .label { color: var(--c); }
+.jp .steps { display: flex; gap: 4px; margin-top: 4px; flex-wrap: wrap; }
+.jp .s { height: 6px; flex: 1 1 14px; border-radius: 3px; background: color-mix(in srgb, var(--c) 22%, var(--surface-2)); }
+.jp .s.done { background: var(--c); }
+.jp.here { box-shadow: 0 0 0 2px var(--c); }
+@media (max-width: 720px) { .journey { grid-template-columns: repeat(5, minmax(0, 1fr)); } .jp .label { font-size: 11px; letter-spacing: .04em; } }
+
+/* page header */
+.kicker { display: flex; gap: 8px; align-items: center; }
+.kicker i { width: 10px; height: 10px; border-radius: 2px; background: var(--c); }
+.page-h { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; justify-content: space-between; margin-bottom: 14px; }
+.page-h h1 { font: 800 clamp(26px, 3.4vw, 34px)/1.05 var(--f-display); letter-spacing: -.02em; margin-top: 4px; }
+.page-h p { margin: 6px 0 0; color: var(--muted); max-width: 70ch; }
+.pill { display: inline-flex; align-items: center; gap: 5px; border-radius: 99px; padding: 2px 10px; font: 700 13px/1.4 var(--f-label); letter-spacing: .06em; text-transform: uppercase; }
+.pill.done { background: var(--include-bg); color: var(--include); }
+
+/* buttons */
+.btn { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 8px 14px; min-height: 36px; font-weight: 600; display: inline-flex; gap: 8px; align-items: center; transition: transform .12s, box-shadow .12s; }
+.btn:hover { box-shadow: var(--shadow); transform: translateY(-1px); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.btn.big { padding: 12px 20px; font-size: 16px; border-radius: 12px; }
+
+/* numbers: display face, tabular */
+.counts { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+.count { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--c, var(--border)); border-radius: 10px; padding: 8px 14px; min-width: 120px; }
+.count b { display: block; font: 800 26px/1 var(--f-display); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+
+/* ---------- screening ---------- */
+.screen { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+@media (max-width: 1000px) { .screen { grid-template-columns: minmax(0, 1fr); } }
+.rec { position: relative; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); overflow: clip; }
+.rec::before { content: ""; display: block; height: 6px; background: var(--select); }
+.rec-body { padding: 18px 26px 8px; }
+.rec .typeline { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; }
+.rec .typeline .mono { color: var(--muted); }
+.rec h2 { font: 600 21px/1.35 var(--f-body); margin: 10px 0 4px; letter-spacing: -.005em; }
+.rec .authors { color: var(--muted); font-size: 14px; }
+.rec .abstract { margin: 14px 0 10px; max-width: 76ch; font-size: 15.5px; line-height: 1.7; }
+.rec mark { background: color-mix(in srgb, var(--unsure) 22%, transparent); color: inherit; border-radius: 3px; padding: 0 2px; }
+.deal { animation: deal .22s cubic-bezier(.2, .8, .2, 1); }
+@keyframes deal { from { transform: translateX(18px); opacity: .2; } }
+
+/* the decision: three buttons, each with its colour, its shape and its word */
+.decide-bar { position: sticky; bottom: 0; background: var(--surface); border-top: 1px solid var(--border); padding: 10px 26px 14px; }
+.decide-top { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; align-items: center; font-size: 13px; color: var(--muted); }
+.decide { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 8px; }
+.decide button { --c: var(--accent); --cb: var(--accent-2); border: 1.5px solid var(--border); background: var(--surface); border-radius: 12px; padding: 12px; min-height: 48px;
+  font: 700 16px/1 var(--f-body); display: flex; gap: 8px; align-items: center; justify-content: center; transition: background .12s, border-color .12s, transform .08s; }
+.decide button:hover, .decide button[aria-pressed="true"] { border-color: var(--c); background: var(--cb); color: var(--c); }
+.decide button:active { transform: scale(.98); }
+.decide .inc { --c: var(--include); --cb: var(--include-bg); } .decide .uns { --c: var(--unsure); --cb: var(--unsure-bg); } .decide .exc { --c: var(--exclude); --cb: var(--exclude-bg); }
+.decide svg { width: 18px; height: 18px; }
+kbd { font: 500 11.5px var(--f-mono); border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 5px; padding: 0 5px; background: var(--surface-2); color: var(--muted); }
+@media (max-width: 720px) { .decide-bar { padding: 8px 12px 10px; } .decide-top .hint { display: none; } .decide button { padding: 10px 6px; font-size: 15px; } .decide kbd { display: none; } .rec-body { padding: 14px 16px 6px; } }
+
+/* the stamp: a short, quiet confirmation on the record itself, with its word */
+.stamp { position: absolute; top: 46px; right: 22px; z-index: 3; padding: 4px 12px; border: 2.5px solid var(--c); border-radius: 8px; color: var(--c); background: var(--surface);
+  font: 800 18px/1.1 var(--f-display); text-transform: uppercase; letter-spacing: .04em; transform: rotate(-4deg); animation: stamp .18s ease-out both; pointer-events: none; }
+@media (max-width: 720px) { .stamp { top: 12px; right: 12px; font-size: 15px; } }
+@keyframes stamp { from { transform: rotate(-4deg) scale(1.25); opacity: 0; } }
+
+.side { display: grid; gap: 16px; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 14px 16px; }
+.panel h3 { font: 700 13.5px/1.2 var(--f-label); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.panel ul { margin: 0; padding-left: 18px; font-size: 14px; }
+.queue { list-style: none; padding: 0 !important; display: grid; gap: 2px; }
+.queue li { display: grid; grid-template-columns: 20px 52px minmax(0, 1fr); gap: 6px; align-items: center; padding: 5px 6px; border-radius: 8px; font-size: 13.5px; }
+.queue li span:last-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.queue li.on { background: var(--accent-2); }
+.queue .mono { font-size: 12px; color: var(--muted); }
+.dot { width: 18px; height: 18px; border-radius: 50%; display: grid; place-items: center; color: var(--surface); }
+.dot svg { width: 11px; height: 11px; }
+.dot.inc { background: var(--include); } .dot.exc { background: var(--exclude); } .dot.uns { background: var(--unsure); } .dot.todo { background: none; border: 1.5px dashed var(--field-border); }
+
+/* ---------- home ---------- */
+.hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: center; margin: 8px 0 28px; }
+@media (max-width: 860px) { .hero { grid-template-columns: minmax(0, 1fr); } }
+.hero h1 { font: 800 clamp(34px, 5vw, 56px)/1 var(--f-display); letter-spacing: -.03em; margin: 8px 0 14px; }
+.hero h1 em { font-style: normal; color: var(--accent); }
+.hero p { color: var(--muted); font-size: 17px; max-width: 48ch; margin: 0 0 20px; }
+.hero .cta { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+.fan { position: relative; height: 300px; overflow-x: clip; }
+@media (max-width: 860px) { .fan { height: 240px; } }
+.mini { position: absolute; left: 50%; top: 50%; width: 210px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 18px 40px rgba(20, 25, 34, .18);
+  overflow: hidden; font-size: 12.5px; transform: translate(-50%, -50%) translateX(var(--x)) rotate(var(--r)); animation: fanIn .5s cubic-bezier(.2, .8, .2, 1) both; animation-delay: var(--d); }
+.mini::before { content: ""; display: block; height: 5px; background: var(--c); }
+.mini .in { padding: 10px 12px 12px; }
+.mini b { display: block; font: 600 13.5px/1.3 var(--f-body); margin: 4px 0 6px; }
+.mini .ln { height: 5px; border-radius: 3px; background: var(--surface-2); margin-top: 5px; }
+.mini .verdict { margin-top: 10px; }
+@keyframes fanIn { from { transform: translate(-50%, -40%) rotate(0); opacity: 0; } }
+@media (max-width: 400px) { .mini { width: 170px; } }
+
+.home-h { font: 800 24px/1.1 var(--f-display); letter-spacing: -.01em; margin: 0 0 12px; }
+.phases { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; margin-bottom: 28px; }
+@media (max-width: 1000px) { .phases { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); } }
+.phase { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; text-align: left; padding: 0;
+  transition: transform .15s, box-shadow .15s; }
+.phase:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+.phase .art { aspect-ratio: 4 / 3; background: var(--a); }
+.phase .art svg { width: 100%; height: 100%; display: block; }
+.phase .in { padding: 10px 14px 14px; display: grid; gap: 4px; }
+.phase .label { color: var(--c); }
+.phase h3 { font: 700 18px/1.2 var(--f-display); }
+.phase p { margin: 0; color: var(--muted); font-size: 13.5px; }
+.phase .state { margin-top: 4px; font-size: 13px; }
+
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+[hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="mock-bar" role="toolbar" aria-label="Mock-up controls">
+  <strong>Mock-up, not the app</strong>
+  <button type="button" data-view="home" aria-pressed="true">Homepage</button>
+  <button type="button" data-view="screen" aria-pressed="false">Screening</button>
+  <button type="button" id="theme" aria-pressed="false">Dark theme</button>
+</div>
+
+<header class="toolbar">
+  <div class="brand"><span class="mark" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg></span><span class="w">Scoping Review Workbench</span></div>
+  <button class="tbtn review-pick" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 7h6l2 2h10v10H3z"/></svg>Example review ▾</button>
+  <span class="spacer"></span>
+  <button class="tbtn" type="button" aria-label="Timeline"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><span class="w">Timeline</span></button>
+  <button class="tbtn" type="button" aria-label="Checklist"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8 12l3 3 5-6"/></svg><span class="w">Checklist</span></button>
+  <button class="tbtn" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2.1 2.1M16.3 16.3l2.1 2.1M5.6 18.4l2.1-2.1M16.3 7.7l2.1-2.1"/></svg><span class="w">Settings</span></button>
+</header>
+
+<main class="wrap">
+  <!-- ======================= Homepage ======================= -->
+  <section id="v-home">
+    <div class="hero">
+      <div>
+        <span class="label">Scoping review · reported to PRISMA-ScR</span>
+        <h1>Your scoping review, <em>step by step.</em></h1>
+        <p>From the first idea to the flow diagram. Each review is a folder on your PC, and nothing is uploaded.</p>
+        <div class="cta">
+          <button class="btn primary big" type="button">Continue: Report →</button>
+          <button class="btn big" type="button">See a finished example</button>
+        </div>
+        <div class="counts">
+          <div class="count" style="--c: var(--find)"><b>110</b><span class="label">records found</span></div>
+          <div class="count" style="--c: var(--select)"><b>20</b><span class="label">full texts sought</span></div>
+          <div class="count" style="--c: var(--include)"><b>4</b><span class="label">papers included</span></div>
+        </div>
+      </div>
+      <div class="fan" aria-hidden="true">
+        <div class="mini" style="--x: -110px; --r: -8deg; --d: .05s; --c: var(--exclude)"><div class="in"><span class="label">R0003 · 2021</span><b>Task planner for robotic disassembly of battery packs</b><div class="ln"></div><div class="ln" style="width: 80%"></div><div class="verdict"><span class="pill" style="background: var(--exclude-bg); color: var(--exclude)">✕ Exclude · E3</span></div></div></div>
+        <div class="mini" style="--x: 110px; --r: 7deg; --d: .15s; --c: var(--unsure)"><div class="in"><span class="label">R0001 · 2019</span><b>Design for assembly and disassembly of battery packs</b><div class="ln"></div><div class="ln" style="width: 70%"></div><div class="verdict"><span class="pill" style="background: var(--unsure-bg); color: var(--unsure)">? Unsure</span></div></div></div>
+        <div class="mini" style="--x: 0px; --r: -1deg; --d: .25s; --c: var(--include)"><div class="in"><span class="label">R0016 · 2025</span><b>Modular battery pack design and serviceability in electric vehicles</b><div class="ln"></div><div class="ln" style="width: 85%"></div><div class="ln" style="width: 60%"></div><div class="verdict"><span class="pill done">✓ Include</span></div></div></div>
+      </div>
+    </div>
+
+    <h2 class="home-h">How a review goes</h2>
+    <div class="phases" id="phases"></div>
+    <p class="label">The folder pictures, the demo and the tour stay as they are, under this.</p>
+  </section>
+
+  <!-- ======================= Screening ======================= -->
+  <section id="v-screen" hidden>
+    <nav class="journey" aria-label="Where you are in the review">
+      <div class="jp" style="--c: var(--plan)"><span class="label">Plan</span><div class="steps"><i class="s done"></i><i class="s done"></i><i class="s done"></i><i class="s done"></i><i class="s"></i></div></div>
+      <div class="jp" style="--c: var(--find)"><span class="label">Find</span><div class="steps"><i class="s done"></i></div></div>
+      <div class="jp here" style="--c: var(--select)" aria-current="step"><span class="label">Select · here</span><div class="steps"><i class="s done"></i><i class="s"></i><i class="s"></i><i class="s"></i></div></div>
+      <div class="jp" style="--c: var(--chart)"><span class="label">Chart</span><div class="steps"><i class="s"></i></div></div>
+      <div class="jp" style="--c: var(--report)"><span class="label">Report</span><div class="steps"><i class="s"></i></div></div>
+    </nav>
+
+    <div class="page-h">
+      <div>
+        <div class="kicker" style="--c: var(--select)"><i></i><span class="label">Select · step 7 of 9</span></div>
+        <h1>Titles &amp; abstracts</h1>
+        <p>Read each title and abstract and decide: include, unsure or exclude with a reason.</p>
+      </div>
+      <div style="display: flex; gap: 8px"><button class="btn" type="button">? Help</button></div>
+    </div>
+
+    <div class="counts">
+      <div class="count"><b>110</b><span class="label">unique records</span></div>
+      <div class="count" style="--c: var(--select)"><b id="left">12</b><span class="label">to screen</span></div>
+      <div class="count"><b>0</b><span class="label">problems</span></div>
+    </div>
+
+    <div class="screen">
+      <article class="rec" id="rec" aria-labelledby="rec-title">
+        <div class="rec-body" id="rec-body">
+          <div class="typeline"><span class="mono">R0001</span><span class="label">Journal article · 2019</span><span class="label" id="rec-state">Not decided</span></div>
+          <h2 id="rec-title">Design for assembly and disassembly of battery packs</h2>
+          <div class="authors">Collijn, Mikaela; Johansson, Emma</div>
+          <p class="abstract">This thesis studies how the <mark>design</mark> of <mark>battery packs</mark> for electric vehicles affects how easily they can be taken apart for repair, reuse and recycling. It reviews joining methods, from welded busbars to bolted modules, and proposes a set of <mark>design for disassembly</mark> guidelines for pack engineers.</p>
+          <p class="label" style="margin: 0 0 12px">Example text written for this mock-up</p>
+        </div>
+        <div class="decide-bar">
+          <div class="decide-top"><span class="hint">I include · U unsure · E exclude, then 1–9 reason · Z undo</span><span><button class="tbtn" type="button">← Previous</button><button class="tbtn" type="button">Next →</button></span></div>
+          <div class="decide">
+            <button class="inc" type="button" data-d="include" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Include <kbd>I</kbd></button>
+            <button class="uns" type="button" data-d="unsure" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M9 9a3 3 0 1 1 4 2.8c-.8.4-1 1-1 1.7V15M12 19h.01"/></svg>Unsure <kbd>U</kbd></button>
+            <button class="exc" type="button" data-d="exclude" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Exclude <kbd>E</kbd></button>
+          </div>
+        </div>
+      </article>
+      <aside class="side">
+        <div class="panel"><h3>Include a paper if…</h3><ul><li>Lithium-ion battery packs or modules, any application</li><li>Describes, proposes or assesses a design feature or method that affects disassembly</li><li>Journal article or conference paper, in English</li></ul></div>
+        <div class="panel"><h3>Queue · 110</h3>
+          <ul class="queue">
+            <li class="on"><span class="dot todo" aria-label="not decided"></span><span class="mono">R0001</span><span>Design for assembly and disassembly…</span></li>
+            <li><span class="dot inc" aria-label="include"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M5 12l5 5 9-10"/></svg></span><span class="mono">R0002</span><span>Breaking it down: a techno-economic…</span></li>
+            <li><span class="dot exc" aria-label="exclude"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="mono">R0003</span><span>Task planner for robotic disassembly…</span></li>
+            <li><span class="dot uns" aria-label="unsure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M12 7v6M12 18h.01"/></svg></span><span class="mono">R0004</span><span>Eco-design of electric vehicle packs…</span></li>
+            <li><span class="dot exc" aria-label="exclude"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span><span class="mono">R0005</span><span>Robotics for electric vehicles battery…</span></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </section>
+</main>
+
+<script>
+// The five phase pictures: our own line art on the phase colour, viewBox 200 × 150, after Methodical's art rules
+// (main lines width 3, details 2, round caps, one idea per picture).
+const I = "var(--art-ink)", D = "var(--art-dim)", A = "var(--art-acc)";
+const ln = (d, c = I, w = 3) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round"/>`;
+const tx = (x, y, s, c = I, size = 15) => `<text x="${x}" y="${y}" fill="${c}" font-size="${size}" text-anchor="middle" font-family="Barlow Condensed, Arial Narrow, sans-serif" font-weight="700" letter-spacing="1">${s}</text>`;
+const PICS = {
+  plan: `<circle cx="80" cy="62" r="34" fill="none" stroke="${I}" stroke-width="3"/><circle cx="120" cy="62" r="34" fill="none" stroke="${I}" stroke-width="3"/><circle cx="100" cy="94" r="34" fill="none" stroke="${A}" stroke-width="3"/>
+    ${tx(66, 56, "P")}${tx(134, 56, "C")}${tx(100, 118, "C", A)}<circle cx="100" cy="74" r="5" fill="${A}"/>`,
+  find: `${[40, 100, 160].map(x => `<ellipse cx="${x}" cy="28" rx="20" ry="6" fill="none" stroke="${I}" stroke-width="3"/>${ln(`M${x - 20} 28v20a20 6 0 0 0 40 0V28`)}`).join("")}
+    ${ln("M30 70h140l-50 36v22l-40 12v-34z")}${ln("M40 58l10 10M100 58v10M160 58l-10 10", D, 2)}${tx(100, 92, "111", A, 18)}`,
+  select: `${[0, 1, 2].map(i => `<rect x="${78 + i * 3}" y="${20 + i * 4}" width="44" height="56" rx="5" fill="var(--select-art)" stroke="${I}" stroke-width="2.5"/>`).join("")}
+    ${ln("M100 86v10M100 96L52 112M100 96l48 16", D, 2)}
+    <rect x="28" y="112" width="48" height="26" rx="5" fill="none" stroke="${I}" stroke-width="3"/>${ln("M42 125l6 6 12-12", A)}
+    <rect x="124" y="112" width="48" height="26" rx="5" fill="none" stroke="${D}" stroke-width="3"/>${ln("M140 119l16 12M156 119l-16 12", D)}`,
+  chart: `<rect x="30" y="24" width="140" height="102" rx="6" fill="none" stroke="${I}" stroke-width="3"/>${ln("M30 46h140M76 24v102M124 24v102", I, 2)}
+    ${[60, 80, 100].map(y => ln(`M40 ${y}h26M86 ${y}h${y === 80 ? 30 : 20}M134 ${y}h${y === 60 ? 26 : 16}`, y === 80 ? A : D, 4)).join("")}`,
+  report: `<rect x="30" y="18" width="70" height="22" rx="4" fill="none" stroke="${I}" stroke-width="2.5"/><rect x="30" y="58" width="70" height="22" rx="4" fill="none" stroke="${I}" stroke-width="2.5"/>
+    <rect x="30" y="98" width="70" height="26" rx="4" fill="none" stroke="${A}" stroke-width="3"/><rect x="122" y="58" width="52" height="22" rx="4" fill="none" stroke="${D}" stroke-width="2.5"/>
+    ${ln("M65 40v18M65 80v18M100 69h22", I, 2)}${tx(65, 33, "n = 111", I, 12)}${tx(65, 73, "n = 20", I, 12)}${tx(65, 116, "n = 4", A, 14)}${tx(148, 73, "n = 16", D, 12)}`,
+};
+const PHASES = [
+  ["plan", "#8AA6FF", "Plan", "Question and rules", "Research question, search strategy, inclusion rules, lock.", "✓ Done"],
+  ["find", "#7DD3FC", "Find", "Search and import", "Run the searches and load the results.", "✓ 111 found"],
+  ["select", "#C4B5FD", "Select", "Screen papers", "Titles and abstracts, then full texts.", "12 left to screen"],
+  ["chart", "#FDBA74", "Chart", "Chart the data", "Fill in one form for each included paper.", "Not started"],
+  ["report", "#D9D6B4", "Report", "Report", "Flow diagram, checklist and exports.", "Not started"],
+];
+document.getElementById("phases").innerHTML = PHASES.map(([k, , label, title, text, state]) =>
+  `<button class="phase" type="button" style="--c: var(--${k}); --a: var(--${k}-art)"><span class="art"><svg viewBox="0 0 200 150" preserveAspectRatio="xMidYMid meet" aria-hidden="true">${PICS[k]}</svg></span>
+   <span class="in"><span class="label">${label}</span><h3>${title}</h3><p>${text}</p><span class="state">${state}</span></span></button>`).join("");
+
+// mock-up switcher
+document.querySelectorAll("[data-view]").forEach(b => b.onclick = () => {
+  document.querySelectorAll("[data-view]").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  document.getElementById("v-home").hidden = b.dataset.view !== "home";
+  document.getElementById("v-screen").hidden = b.dataset.view !== "screen";
+});
+const theme = document.getElementById("theme");
+theme.onclick = () => { const dark = document.documentElement.dataset.theme !== "dark"; document.documentElement.dataset.theme = dark ? "dark" : "light"; theme.setAttribute("aria-pressed", String(dark)); };
+if (location.hash === "#screen") document.querySelector('[data-view="screen"]').click();
+if (new URLSearchParams(location.search).get("theme") === "dark") theme.click();
+
+// a decision: the button stays pressed, a stamp with the word lands on the record, then the next record slides in
+const WORDS = { include: "Included", unsure: "Unsure", exclude: "Excluded" }, VAR = { include: "--include", unsure: "--unsure", exclude: "--exclude" };
+let left = 12;
+document.querySelectorAll(".decide button").forEach(b => b.onclick = () => {
+  const d = b.dataset.d, rec = document.getElementById("rec");
+  document.querySelectorAll(".decide button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+  rec.querySelector(".stamp")?.remove();
+  rec.insertAdjacentHTML("afterbegin", `<span class="stamp" style="--c: var(${VAR[d]})">${WORDS[d]}</span>`);
+  document.getElementById("rec-state").textContent = `Decided: ${d}`;
+  setTimeout(() => {
+    rec.querySelector(".stamp")?.remove();
+    document.querySelectorAll(".decide button").forEach(x => x.setAttribute("aria-pressed", "false"));
+    document.getElementById("rec-state").textContent = "Not decided";
+    document.getElementById("left").textContent = String(left = Math.max(0, left - 1));
+    const body = document.getElementById("rec-body"); body.classList.remove("deal"); void body.offsetWidth; body.classList.add("deal");
+  }, matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 650);
+});
+</script>
+</body>
+</html>
