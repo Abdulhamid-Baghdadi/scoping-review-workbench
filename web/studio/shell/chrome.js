@@ -115,10 +115,9 @@ const kicker = st => h("div", { class: `kicker ${phaseClass(st.phase)}` }, h("i"
 
 function renderTop() {
   const mapbar = $("#mapbar");
-  if (CUR === HOME) {                                               // the Homepage explains; the page itself holds the choices
+  if (CUR === HOME) {                                               // the Homepage draws its own title, beside its picture
     mapbar.replaceChildren();
-    $("#topbar").replaceChildren(h("div", { class: "home-hero" }, h("h1", {}, "Welcome to Scoping Review Workbench"),
-      h("p", {}, `A guided ${S.review_type.label.toLowerCase()}, from your question to the PRISMA report. Everything stays on your PC.`)));
+    $("#topbar").replaceChildren();
     return;
   }
   mapbar.replaceChildren(flowMap());

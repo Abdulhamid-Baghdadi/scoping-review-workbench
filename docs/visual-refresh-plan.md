@@ -1,7 +1,10 @@
 # Visual refresh: plan
 
-Status: steps 1–3 (fonts, tokens, type) 4 (journey map and page header), 5 (screening) and 6 (pictures and icons) done on 31 October 2026, screenshots in
-[visual-refresh/after-steps-1-3/](visual-refresh/after-steps-1-3/); steps 7–10 still to do. Step 6 drew the five
+Status: steps 1–3 (fonts, tokens, type) 4 (journey map and page header), 5 (screening), 6 (pictures and icons) and 7 (Homepage) done on 31 October 2026, screenshots in
+[visual-refresh/after-steps-1-3/](visual-refresh/after-steps-1-3/); steps 8–10 still to do. The Homepage's card fan
+shows three of the review's own decided records (none are made up); before there are any, it shows the picture of the
+phase the review is in. Its phase cards are titled "Your review, phase by phase", since the walk-through below keeps
+"How a review goes". Step 6 drew the five
 phase pictures (`web/art/phase-pictures.js`, shown on the start screen) and the icons of the toolbar, the Settings
 menu and the start screen (`web/art/icons.js`); emoji inside the pages remain for step 9. Step 5 departs from the
 mock-up in one place: the stamp lands on the last-decision line under the record, not on the record, because the next

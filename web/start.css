@@ -39,13 +39,7 @@
 /* how a review goes: the phases in order, each a card with its picture, its name and its steps */
 .start-flow { max-width: 1000px; }
 .start-flow h2 { margin: 0 0 10px; font: 800 22px/1.1 var(--display); letter-spacing: -.01em; }
-.phase-cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; counter-reset: phase; }
-@media (max-width: 900px) { .phase-cards { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 10px; } }
-.phase-card { counter-increment: phase; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; }
-.phase-card .phase-pic { display: block; width: 100%; height: auto; }
-.phase-card .phase-name { padding: 10px 12px 0; font: 700 14px/1.2 var(--label); letter-spacing: .08em; text-transform: uppercase; color: var(--phase); }
-.phase-card .phase-name::before { content: counter(phase) " · "; }
-.phase-card .phase-steps { padding: 4px 12px 12px; font-size: 13px; color: var(--muted); }
+/* the phase cards themselves: style.css (shared with the Homepage) */
 
 @media (max-width: 860px) {
   .start { grid-template-columns: minmax(0, 1fr); height: auto; min-height: 100vh; }

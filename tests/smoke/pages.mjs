@@ -115,7 +115,11 @@ try {
     await page.evaluate(i => document.getElementById(i)?.click(), id); await page.waitForTimeout(150);
     await page.keyboard.press("Escape"); await page.waitForTimeout(60);
   }
-  actions.home = (await where()) === "#home";
+  // the Homepage: one primary action, five phase cards with their pictures, and the accessibility floor like every page
+  await page.waitForTimeout(800);                           // its numbers count up once
+  actions.home = (await where()) === "#home" && await page.evaluate(() => [...document.querySelectorAll("#app .btn.primary")].filter(b => b.offsetParent).length === 1
+    && document.querySelectorAll("#page .phase-cards .phase-card svg[role=img][aria-label]").length === 5 && document.querySelector(".home-count b")?.textContent === "110");
+  await checkFloor("#home");
   // Review settings of the example: saving keeps the example open (it has no folder of its own)
   await page.evaluate(() => document.getElementById("btnReviewSettings")?.click()); await page.waitForTimeout(200);
   await page.fill("dialog.modal input[maxlength='12']", "SM");

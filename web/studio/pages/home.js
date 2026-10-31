@@ -5,12 +5,13 @@
 import { h, store } from "../core/dom.js";
 import { S } from "../core/state.js";
 import { PAGES } from "../shell/registry.js";
-import { go, stepOf } from "../shell/navigation.js";
+import { go, goStep, stepOf, stepStatus } from "../shell/navigation.js";
 import { openFinishedExample } from "../shell/reviews.js";
 import { startTour } from "../shell/tour.js";
 import { svg } from "../ui/charts.js";
-import { btn, card, hlQuery } from "../ui/components.js";
+import { btn, card, decDot, hlQuery } from "../ui/components.js";
 import { folderStrip } from "../ui/folder-strip.js";
+import { phasePicture } from "../ui/phase-picture.js";
 
 // The animated demo on the Homepage: a small mock screen that plays through the five steps of a review.
 // Plain DOM and CSS (no video file), so it works offline and follows the light/dark theme.
@@ -105,19 +106,73 @@ function homeDemo() {
     h("div", { class: "demo-ringwrap" }, ring, play), h("div", {}, screen, caption), side));
 }
 
-// Homepage: the demo and the tour
+// The review's own numbers count up once per visit, not on every redraw (the page is redrawn when the review changes)
+let counted = false;
+function countUp(el, n) {
+  if (counted || matchMedia("(prefers-reduced-motion: reduce)").matches || n < 2) { el.textContent = n.toLocaleString(); return; }
+  const t0 = performance.now(), ms = 700;
+  const tick = t => { const p = Math.min(1, (t - t0) / ms); el.textContent = Math.round(n * (1 - (1 - p) ** 3)).toLocaleString(); if (p < 1) requestAnimationFrame(tick); };
+  requestAnimationFrame(tick);
+}
+
+const DECIDED = { include: "Include", exclude: "Exclude", unsure: "Unsure" };
+const decisionOf = r => (["include", "exclude"].includes(r.ft_decision) ? r.ft_decision : r.ta_decision);
+
+/** Three of the review's own decided records, fanned out like cards: one of each decision where there is one. */
+function recordFan() {
+  const pick = ["exclude", "unsure", "include"].map(d => S.records.find(r => decisionOf(r) === d)).filter(Boolean);
+  if (!pick.length) return null;
+  const turn = [[-108, -8], [108, 7], [0, -1]].slice(3 - pick.length);
+  return h("div", { class: "record-fan", "aria-hidden": "true" },             // decoration: the same records are in the queue
+    pick.map((r, k) => { const d = decisionOf(r);
+      return h("div", { class: `fan-card dec-${d}`, style: `--x:${turn[k][0]}px;--r:${turn[k][1]}deg;--d:${0.08 * k}s` },
+        h("span", { class: "fan-id" }, [r.record_id, r.year].filter(Boolean).join(" · ")), h("b", {}, r.title),
+        h("i", {}), h("i", {}), h("span", { class: `fan-verdict` }, decDot(d), " ", DECIDED[d], d === "exclude" && (r.ft_reason || r.ta_reason) ? ` · ${(r.ft_reason || r.ta_reason).split(" ")[0]}` : "")); }));
+}
+
+/** What a phase's steps add up to: done, in progress or not started, in words. */
+function phaseState(steps) {
+  const st = steps.map(stepStatus);
+  if (st.every(s => s === "done" || s === "skipped")) return ["done", "✓ Done"];
+  if (st.some(s => s !== "not-started")) return ["in-progress", "In progress"];
+  return ["not-started", "Not started"];
+}
+
+/** The review phase by phase: each phase's picture, its steps and how far it is; a click opens its first open step. */
+function phaseCards() {
+  const phases = [...new Set(S.steps.map(st => st.phase))];
+  return h("ol", { class: "phase-cards" }, phases.map(p => {
+    const steps = S.steps.filter(st => st.phase === p), [kind, words] = phaseState(steps);
+    const next = steps.find(st => !["done", "skipped"].includes(stepStatus(st))) ?? steps[0];
+    return h("li", {}, h("button", { class: `phase-card phase-${p.toLowerCase()}`, onclick: () => goStep(next), title: `${p}: open ${next.title}` },
+      phasePicture(p), h("span", { class: "phase-name" }, p), h("span", { class: "phase-steps" }, steps.map(st => st.title).join(" · ")),
+      h("span", { class: `phase-state ${kind}` }, words)));
+  }));
+}
+
 // Homepage: only explains, and offers three ways in. The work itself happens on the steps.
 PAGES.home = () => {
   const last = store.get("last_stage", ""), lastStage = S.stages.find(x => x.key === last);
   const started = lastStage && (S.events.length || S.records.length);
-  const choice = (icon, title, text, onclick, cls = "") => h("button", { class: "home-choice " + cls, onclick },
-    h("span", { class: "hc-icon", "aria-hidden": "true" }, icon), h("span", { class: "hc-title" }, title), h("span", { class: "hc-text" }, text));
+  const f = S.flow, counts = f.unique ? [["find", f.unique, "unique records"], ["select", f.sought, "full texts sought"], ["include", f.included, "papers included"]] : [];
+  const nums = counts.map(([, n]) => h("b", {}, counted ? n.toLocaleString() : "0"));
+  setTimeout(() => { nums.forEach((b, k) => countUp(b, counts[k][1])); counted = true; });
+  // the picture beside the title: three of the review's own records, or, before there are any, where the review stands
+  const here = (started ? stepOf(last) : S.steps[0]).phase;
   return h("div", { class: "home" },
-    h("div", { class: "home-choices" },
-      started ? choice("▶", `Continue: ${stepOf(last).title}`, "Pick up where you left off.", () => go(last), "primary")
-        : choice("▶", "Start your review", "Step 1: write down your research question.", () => go("questions"), "primary"),
-      choice("📘", "See a finished example", "A real search of 110 records, screened down to 4 included papers.", openFinishedExample),
-      choice("🎓", "Take the 1-minute tour", "What each part of the screen is for.", () => { go("questions"); setTimeout(() => startTour(), 250); })),
+    h("section", { class: "home-hero" },
+      h("div", { class: "home-hero-text" },
+        h("span", { class: "kicker" }, `${S.review_type.label} · reported to ${S.review_type.guideline}`),
+        h("h1", {}, `Your ${S.review_type.label.toLowerCase()}, `, h("em", {}, "step by step.")),
+        h("p", { class: "lede" }, "From your question to the PRISMA report. Everything stays in a folder on your PC, and nothing is uploaded."),
+        h("div", { class: "home-actions" },
+          started ? btn(`Continue: ${stepOf(last).title} →`, () => go(last), "primary big", "Pick up where you left off")
+            : btn("Start your review →", () => go("questions"), "primary big", "Step 1: write down your research question"),
+          btn("See a finished example", openFinishedExample, "big", "A real search of 110 records, screened down to 4 included papers"),
+          btn("Take the 1-minute tour", () => { go("questions"); setTimeout(() => startTour(), 250); }, "big ghost", "What each part of the screen is for")),
+        counts.length ? h("div", { class: "home-counts" }, counts.map(([c, , label], k) => h("div", { class: `home-count count-${c}` }, nums[k], h("span", {}, label)))) : null),
+      recordFan() ?? h("div", { class: `home-hero-pic phase-${here.toLowerCase()}` }, phasePicture(here))),
+    card("Your review, phase by phase", "Each phase with its steps and how far it is. Click one to open its first open step.", phaseCards()),
     card("How a review goes", "Five phases, one minute. Click a part of the circle to jump to it.", homeDemo()),
     card("Your review is a folder on your PC", "Nothing is uploaded and there is no account. Every note is plain Markdown, so the folder opens in Obsidian (or any text editor) as it is.",
       folderStrip(),
