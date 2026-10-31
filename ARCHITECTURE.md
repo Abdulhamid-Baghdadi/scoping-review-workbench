@@ -40,7 +40,7 @@ Domain, ports and services use no platform modules (`node:*`, packages), so they
 
 | Layer | Folder | Contains | May import |
 |---|---|---|---|
-| **boot** | `web/main.js`, `web/start/` | Checks the browser, creates the `Backend`, opens the draft review; the start screen when that fails. | start, `src/index.js`, `src/ui/` |
+| **boot** | `web/main.js`, `web/start/` | Checks the browser, creates the `Backend`, opens the draft review; the start screen when that fails. | start, `src/index.js`, `src/ui/`; `studio/app.js` by `import()` once a review is open |
 | **core** | `web/studio/core/` | `dom` (h(), $(), small preferences), `state` (the engine's snapshot, the page on screen, drafts, the screening position), `api` (calls to `window.backend`), `autosave`. | core |
 | **ui** | `web/studio/ui/` | Dialogs, small components, SVG charts. | ui, core |
 | **shell** | `web/studio/shell/` | Navigation, `render()` and everything around the page (top bar, tabs, journey map, metrics), help, review switching and settings, toolbar, keyboard, tour, and the **registry** of pages. | shell, ui, core |
@@ -61,7 +61,7 @@ The studio never imports `src/`: everything it knows about the review comes thro
 - **The review folder is the contract.** File names and formats stay stable, so existing reviews keep opening, in this app and in Obsidian. Text rules (whitespace, line breaks, character counting, sorting) go through `domain/text-rules.js` so every note is written the same way.
 - **Effects at the edges.** Dates, random seeds and file access are passed in (ports); domain functions return values instead of writing. This keeps them deterministic and testable.
 - **No build step, no framework.** The site is the source tree, which is easy to audit and to run offline (`web/sw.js` stores it on first visit). The cost is a hand-written `h()` and an explicit `render()`.
-- **Inversion where the layers would otherwise point up.** `core/api.js` redraws and asks for amendment reasons through a `view` port that `app.js` connects. The shell draws pages and dispatches page keys through the registry (`PAGES`, `PAGE_KEYS`) that the pages fill in. So no lower layer imports a higher one.
+- **Inversion where the layers would otherwise point up.** `core/api.js` redraws and asks for amendment reasons through a `view` port that `app.js` connects. The shell draws pages and dispatches page keys through the registry (`PAGES`, `PAGE_KEYS`) that the pages fill in. So no lower layer imports a higher one. Inside the shell four imports still point back, so files there use one another in a circle: `navigation.js`, `reviews.js` and `journey-map.js` redraw with `chrome.js`'s `render()`, and `navigation.js` and `help.js` use each other. They are listed in `architecture.json` as allowed, with why, and marked △ on the dependency matrix until they are inverted the same way.
 - **One module, one concern.** A module is named after what it is about (`matching`, `screening`, `journey-map`), exports a small API, and documents it with JSDoc at the top.
 - **Public API.** Code outside `src/` (the boot code, tools, tests of the API) imports from `src/index.js` or the browser shell `src/ui/`.
 
@@ -70,7 +70,9 @@ The studio never imports `src/`: everything it knows about the review comes thro
 | Kind | Where | Run | Needs |
 |---|---|---|---|
 | Unit | `tests/unit/` | `npm test` | nothing |
-| Architecture | `scripts/check-architecture.js` | `npm run check` | nothing |
+| Architecture | `scripts/check-architecture.js` on `architecture.json`; its own tests in `tests/unit/architecture.test.js` | `npm run check` | nothing |
 | Smoke (browser) | `tests/smoke/pages.mjs` | `npm run smoke` | Playwright and Chromium |
 
 Every engine module gets unit tests for its rules. The smoke test opens the finished example in headless Chromium, walks through every page, opens the panels and does a few actions (an idea note, a screening decision, Review settings). It fails on any console error, and writes the text of every page to a file (`npm run smoke -- out.json`), so a refactor can be checked against the text before it. `scripts/bench-open.js` times opening a real review (use a copy).
+
+The architecture check holds the layers above, written in `architecture.json`, to the layering contract of the design rules (UA-SMARTLab/design-rules, `skill/architecture.md`). It reads every `import`, `export … from` and `import()`, and fails on an import of a layer above or of one a layer may not use, a cycle, a package a layer must keep out, a module in no layer, or an import of a file that is not there. It needs only Node, so the site's workflow runs it before publishing. The design rules' audit tool reads the same file, gives the same findings, and draws the dependency matrix, every module against every other: `python ~/.claude/skills/web-app-design/scripts/check_layers.py . --page build/dependencies.html`.

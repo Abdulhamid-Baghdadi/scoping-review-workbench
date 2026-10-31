@@ -5,3 +5,4 @@ __pycache__/
 dist/
 video-media/
 !web/example/full-texts/*.pdf
+build/
