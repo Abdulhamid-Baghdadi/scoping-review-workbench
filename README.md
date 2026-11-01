@@ -174,6 +174,7 @@ npm run check            # architecture: each layer imports only what it may
 npm run build            # the static site in dist/
 node scripts/bench-open.js "<copy of a … records folder>"   # how fast a review opens
 node scripts/readme-screenshot.js   # the README's pictures in docs/readme/, with made-up papers (needs npm run serve and ffmpeg)
+node scripts/ui-audit.js            # the measured part of a UI audit, where npm run smoke does not go (320 px, open panels, motion)
 ```
 
 Every push to `main` is tested, built and published on GitHub Pages, and the download ZIP on the [latest release](https://github.com/Abdulhamid-Baghdadi/scoping-review-workbench/releases/latest) is rebuilt (`.github/workflows/pages.yml`). Review data is never part of this repository.
