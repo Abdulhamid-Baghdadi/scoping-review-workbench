@@ -58,8 +58,8 @@ The studio never imports `src/`: everything it knows about the review comes thro
 
 ## Design authority
 
-This file is the workbench's design authority. Its layering check follows the design rules (UA-SMARTLab/design-rules)
-at commit `9fb580c` (2026-11-01); since then the workbench changes its own rules here and never the shared ones. No
+This file is the workbench's design authority. Its layering check follows the design rules ([UA-SMARTLab/design-rules](https://github.com/UA-SMARTLab/design-rules))
+at commit [`9fb580c`](https://github.com/UA-SMARTLab/design-rules/tree/9fb580c) (2026-11-01); since then the workbench changes its own rules here and never the shared ones. No
 departure from them is listed yet. Its architecture check is the design rules' example for ES modules, so that much
 has already gone back. A departure added later gets why, date and whether it is worth proposing back; the user
 decides.
@@ -87,4 +87,4 @@ Every engine module gets unit tests for its rules. The smoke test opens the fini
 
 The README's pictures (`docs/readme/`) are made from the program itself by `scripts/readme-screenshot.js`, with made-up papers in a fresh headless Chromium: the screening animation (a GIF from Playwright's video, through ffmpeg, under 5 s and played once) and the screening page, the Homepage and the tour as stills, light and dark. Make them again when the look changes; `tests/unit/readme.test.js` checks that every picture the README shows is there, has alt text, and that the animation stops by itself within 5 s.
 
-The architecture check holds the layers above, written in `architecture.json`, to the layering contract of the design rules (UA-SMARTLab/design-rules, `skill/architecture.md`). It reads every `import`, `export … from` and `import()`, and fails on an import of a layer above or of one a layer may not use, a cycle, a package a layer must keep out, a module in no layer, or an import of a file that is not there. It needs only Node, so the site's workflow runs it before publishing. The design rules' audit tool reads the same file, gives the same findings, and draws the dependency matrix, every module against every other: `python ~/.claude/skills/web-app-design/scripts/check_layers.py . --page build/dependencies.html`.
+The architecture check holds the layers above, written in `architecture.json`, to the layering contract of the design rules ([UA-SMARTLab/design-rules, `skill/architecture.md`](https://github.com/UA-SMARTLab/design-rules/blob/9fb580c/skill/architecture.md)). It reads every `import`, `export … from` and `import()`, and fails on an import of a layer above or of one a layer may not use, a cycle, a package a layer must keep out, a module in no layer, or an import of a file that is not there. It needs only Node, so the site's workflow runs it before publishing. The design rules' audit tool reads the same file, gives the same findings, and draws the dependency matrix, every module against every other: `python ~/.claude/skills/web-app-design/scripts/check_layers.py . --page build/dependencies.html`.
