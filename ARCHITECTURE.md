@@ -56,6 +56,14 @@ The studio never imports `src/`: everything it knows about the review comes thro
 3. The session runs the use case (`services/screening.js`), checks and logs the decision, and saves the records and the state through the `Folder` port. In the browser that is the user's folder (`adapters/browser-folder.js`); in tests it is memory.
 4. The backend returns a new snapshot (`ui/view-model.js`). `core/api.js` stores it (`state.setS`) and calls `render()`, which draws the shell and asks the registry for the page on screen.
 
+## Design authority
+
+This file is the workbench's design authority. Its layering check follows the design rules (UA-SMARTLab/design-rules)
+at commit `9fb580c` (2026-11-01); since then the workbench changes its own rules here and never the shared ones. No
+departure from them is listed yet. Its architecture check is the design rules' example for ES modules, so that much
+has already gone back. A departure added later gets why, date and whether it is worth proposing back; the user
+decides.
+
 ## Decisions
 
 - **The review folder is the contract.** File names and formats stay stable, so existing reviews keep opening, in this app and in Obsidian. Text rules (whitespace, line breaks, character counting, sorting) go through `domain/text-rules.js` so every note is written the same way.
