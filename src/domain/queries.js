@@ -10,7 +10,8 @@ export const cleanTerms = text => String(text).split(/[\n;]+/).map(strip).filter
 
 // Stems whose ending the rules below cannot know. A stem standing for two words searches both (alone, not in a phrase).
 const OPENALEX_WORDS = { scor: ["score"], reus: ["reuse"], modul: ["module", "modular"], econom: ["economy"], energ: ["energy"],
-  batter: ["battery"], estimat: ["estimate"], tabl: ["table"], electr: ["electric", "electrical"], electron: ["electronic", "electronics"] };
+  batter: ["battery"], estimat: ["estimate"], tabl: ["table"], electr: ["electric", "electrical"], electron: ["electronic", "electronics"],
+  upgrad: ["upgrade"], durab: ["durable", "durability"], technolog: ["technology"] };   // a real review's string, 21 Nov 2026
 
 /**
  * OpenAlex has no wildcards. It stems every real word (motor = motors, remanufacture = remanufacturing), but a

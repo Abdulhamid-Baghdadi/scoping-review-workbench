@@ -61,6 +61,11 @@ test("search strings per database", () => {
   assert.equal(openalexWord("behaviour* analysis* format* heat* habitat* sensor*"), "behaviour analysis format heat habitat sensor");
   // a guessed ending never makes a word that does not exist (found in a self-test, 20 October 2026)
   assert.equal(openalexWord("electric motor* remanufactur* lab* tabl* reusab* assembl*"), "electric motor remanufacture lab table reusability assembly");
+  // Stems the rules cannot complete, found in a real review's OpenAlex string on 21 Nov 2026 ("upgrad", "durab",
+  // "modular technolog" are not words): the table gives the words, by definition of the stems.
+  assert.equal(openalexWord("upgrad*"), "upgrade");
+  assert.equal(openalexWord("durab*"), "durable OR durability");
+  assert.equal(openalexWord("modular technolog*"), "modular technology");
   assert.deepEqual(openalexChanges([{ terms: ["motor*", "design for", "disassembl*"] }]), [["motor*", "motor"], ["disassembl*", "disassembly"]]);
   const st = defaultState();
   st.concepts = [{ name: "Mod", terms: ["modular*", "module identification"] }, { name: "El", terms: ["electronic*"] }, { name: "Not", role: "NOT", terms: ["software"] }];
