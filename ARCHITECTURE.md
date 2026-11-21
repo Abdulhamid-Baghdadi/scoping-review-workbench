@@ -72,12 +72,12 @@ The five window rules of 19 Nov 2026 (`skill/ui-ux.md`) apply here as follows:
 | Rule | Here | Where it stands |
 |---|---|---|
 | H4a, the reviewer's own reading first where a check rests on the AI's value, Buçinca et al. (2021) | Screening (`web/studio/pages/screening.js`): Claude's suggestion is the AI's value a decision rests on | **Met since 2026-11-21.** In the "To screen" queue no suggestion is shown. In the "Suggested" queue the suggestion stays hidden until the reviewer asks for it on that record (S, or the button), and Enter accepts only a suggestion on screen; nothing is preselected and the log notes whether it was kept. Held by `tests/unit/suggestion-view.test.js`. |
-| E3a, stopping designed into runs over a minute, Bass et al. (2001) | Report: Check citations, its write, and Export to Obsidian library run OpenAlex requests for the whole library behind `busy()` | **Not met.** One request per 50 papers and per 100 cited works can pass a minute on a large library, with no Stop and no result kept per step. **Open:** run in steps, with Stop, saying which steps are kept. The AI skills run outside the window (`bin/ai-assist.js`), so this rule does not reach them. |
+| E3a, stopping designed into runs over a minute, Bass et al. (2001) | Report: Check citations, its write, and Export to Obsidian library run OpenAlex requests for the whole library behind `busy()` | **Met since 2026-11-21.** The OpenAlex lookups run request by request; while they run, a Stop button beside the button ends them between two requests, a status line says which request is under way, and the result says how far a stopped run got. What the finished requests fetched is kept: a stopped preview can still be written, and an export keeps its new notes. Held by two tests in `tests/unit/library-citations.test.js`. The AI skills run outside the window (`bin/ai-assist.js`), so this rule does not reach them. |
 | B4a, ranges as bars and whiskers | No range charts | Does not apply. |
 | B9, an estimate against the last version | No estimates with ranges | Does not apply. |
 | B10, a verdict only when the range excludes zero | No "better" or "lighter" comparisons | Does not apply. |
 
-No departure from the rules is listed: the open item is work to do, not rules set aside.
+No departure from the rules is listed, and nothing is open.
 
 ```mermaid
 flowchart TD

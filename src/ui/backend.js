@@ -400,10 +400,10 @@ export class Backend {
       case "save_fields": return s.saveFields(a.fields, amendment);
       case "add_to_library":
         if (!this.session.library.folder) throw new Error("Choose a library folder in Settings first.");
-        return s.exportToLibrary(this.publicationTemplate ?? this.templates.publication, { status: this.entry.settings?.exportStatus ?? "" });
+        return s.exportToLibrary(this.publicationTemplate ?? this.templates.publication, { status: this.entry.settings?.exportStatus ?? "", onProgress: a.onProgress, signal: a.signal });
       case "library_citations": {
         if (!this.session.library.folder) throw new Error("Choose a library folder in Settings first.");
-        return { raw: await s.libraryCitations({ apply: Boolean(a.apply) }) };
+        return { raw: await s.libraryCitations({ apply: Boolean(a.apply), onProgress: a.onProgress, signal: a.signal }) };
       }
       case "prepare_charting": return s.prepareCharting();
       case "record_history": return { raw: { rows: await s.decisionHistory(a.record_id) } };

@@ -168,3 +168,23 @@ test("allWorks asks for the next page while works are missing", async () => {
   assert.deepEqual(openalex.calls.map(c => [c["per-page"], c.page]), [[200, 1], [200, 2]]);
   assert.deepEqual(await allWorks({ get: async () => ({ results: [] }) }, { filter: "doi:10.9/x" }), [], "an answer without meta ends the paging");
 });
+
+// Design rule E3a (design-rules 7615f26; Bass et al. 2001): a run over a minute is stoppable between steps, and
+// every finished step's result is kept and said. Right results by definition of the rule: 120 library papers are
+// 3 requests of 50; Stop after the first keeps its 50 papers, asks nothing more, and says 1 of 3.
+test("Stop between OpenAlex requests keeps the papers already fetched and says how far it got", async () => {
+  const all = Array.from({ length: 120 }, (_, i) => ({ id: `https://openalex.org/W${i}`, doi: `https://doi.org/10.1/${i}`, referenced_works: [] }));
+  const lib = memoryFolder(Object.fromEntries(all.map((w, i) => [`${String(i).padStart(3, "0")} - P.md`, note(`10.1/${i}`)])));
+  const openalex = pagedOpenalex(all), stop = new AbortController();
+  const get = openalex.get;
+  openalex.get = async (path, params) => { const r = await get(path, params); stop.abort(); return r; };   // Stop pressed during the first request
+  const data = await fetchLibraryWorks(await openLibrary(lib), openalex, () => {}, stop.signal);
+  assert.equal(openalex.calls.length, 1, "no request after Stop");
+  assert.equal(data.works.size, 50, "the finished request's papers are kept");
+  assert.deepEqual(data.stopped, { done: 1, total: 3 });
+});
+
+test("a run nobody stops says nothing about stopping", async () => {
+  const library = await openLibrary(memoryFolder({ "001 - A.md": note("10.1/a"), "002 - B.md": note("10.1/b") }));
+  assert.equal((await fetchLibraryWorks(library, fakeOpenalex())).stopped, undefined);
+});

@@ -36,6 +36,9 @@ export class AmendmentRequired extends Error {
  * @property {boolean} [devMode] protocol locks lifted (changes still logged)
  */
 
+/** What a stopped OpenAlex run says after its result (design rule E3a): how far it got, and how to finish. */
+const stoppedNote = st => (st ? ` Stopped after ${st.done} of ${st.total} OpenAlex requests: the papers found so far are in; cited works not looked up yet are listed by their OpenAlex id. Run Check citations again to finish.` : "");
+
 export class ReviewSession {
   /** @param {ReviewRepository} repo @param {object} st @param {SessionDeps} deps */
   constructor(repo, st, deps) {
@@ -439,11 +442,11 @@ export class ReviewSession {
    * already there only gets this review in `included_in`), then the citations between library papers are updated
    * (`cites`). Without OpenAlex the export still happens and the message says so.
    */
-  async exportToLibrary(template, { status = "" } = {}) {
+  async exportToLibrary(template, { status = "", onProgress, signal } = {}) {
     const added = await this.addToLibrary(template, { status });
     try {
-      const c = await this.libraryCitations({ apply: true });
-      return `${added} Citations: ${c.links} links between ${c.found} library papers, ${c.written} note(s) updated.`;
+      const c = await this.libraryCitations({ apply: true, onProgress, signal });
+      return `${added} Citations: ${c.links} links between ${c.found} library papers, ${c.written} note(s) updated.${stoppedNote(c.stopped)}`;
     } catch (e) {
       return `${added} Citations not updated (${e.message}); use “Check citations” later.`;
     }
@@ -460,16 +463,17 @@ export class ReviewSession {
    * Citations of the library's papers (`cites` with links and DOIs; an old `cited_by` is removed). Without `apply` it only asks OpenAlex and says what would change; with `apply` it writes those notes
    * (from the reference lists fetched for the preview, so a second click costs no OpenAlex requests).
    */
-  async libraryCitations({ apply = false, onProgress } = {}) {
+  async libraryCitations({ apply = false, onProgress, signal } = {}) {
     if (!this.library.folder) throw new ReviewError("Choose a library folder first.");
-    if (!apply || !this.#citationWorks) this.#citationWorks = await fetchLibraryWorks(this.library, this.#requireOpenalex(), onProgress);
+    if (!apply || !this.#citationWorks) this.#citationWorks = await fetchLibraryWorks(this.library, this.#requireOpenalex(), onProgress, signal);
     const { summary, changes } = await planLibraryCitations(this.library, this.#citationWorks);
-    if (!apply) return { ...summary, changed: changes.length, written: 0 };
+    const stopped = this.#citationWorks.stopped;
+    if (!apply) return { ...summary, changed: changes.length, written: 0, stopped };
     const written = await writeLibraryCitations(this.library, changes);
     event(this.st, "report", `library citations updated from OpenAlex: ${summary.links} links between ${summary.found} of ${summary.publications} papers, ${written} note(s) written`, this.now);
     this.#citationWorks = null;
     await this.save();
-    return { ...summary, changed: changes.length, written };
+    return { ...summary, changed: changes.length, written, stopped };
   }
 
   #citationWorks = null;

@@ -11,12 +11,31 @@ import { flowDiagram } from "../ui/charts.js";
 import { bar, btn, card, icon, labelBy, libraryName, openNote, pill } from "../ui/components.js";
 import { confirmBox, modal, toast } from "../ui/dialogs.js";
 
+/**
+ * Runs an OpenAlex step that can take minutes (design rule E3a, Bass et al. 2001): its button waits, a Stop button
+ * beside it ends the run between two requests, and `line` says which request is under way. What the finished
+ * requests fetched is kept; the result says how far a stopped run got.
+ */
+async function stoppable(button, line, run) {
+  const stop = new AbortController();
+  const stopBtn = btn("■ Stop", () => { stop.abort(); stopBtn.disabled = true; stopBtn.textContent = "Stopping after this request…"; }, "sm",
+    "Stop after the request under way; what was fetched so far is kept");
+  button.after(stopBtn);
+  try { return await busy(button, () => run({ signal: stop.signal, onProgress: t => { line.textContent = t; } })); }
+  finally { stopBtn.remove(); line.textContent = ""; }
+}
+
+/** How far a stopped run got, in words; nothing when it ran to the end. */
+const stoppedLine = st => (st ? h("div", { class: "muted", style: "margin-top:4px" },
+  `Stopped after ${st.done} of ${st.total} OpenAlex requests: this covers the papers found so far, and cited works not looked up yet are listed by their OpenAlex id. Check citations again to finish.`) : null);
+
 // Citations between the papers of the library (formerly Library Studio's Citations page): preview, then write.
 function citationsCard() {
-  const out = h("div", { class: "small", style: "margin-top:8px" });
+  const out = h("div", { class: "small", style: "margin-top:8px", role: "status" });
   const show = (r, written) => out.replaceChildren(
     h("div", {}, `${r.publications} publication notes · ${r.found} found in OpenAlex by DOI · ${r.links} citations between library papers · ${r.outside} cited works outside the library (as DOIs)`),
     r.missing ? h("div", { class: "muted" }, `${r.missing} without a DOI found in OpenAlex: their 'cites' stays empty.`) : null,
+    stoppedLine(r.stopped),
     h("div", { style: "margin-top:4px" }, written ? `✓ ${r.written} note(s) updated.` : r.changed ? `${r.changed} note(s) would change.` : "✓ Every note is up to date."),
     !written && r.changed ? h("div", { class: "row end", style: "margin-top:6px" }, btn(`Write to ${r.changed} note(s)`, async e => {
       const button = e.currentTarget;                         // (gone from the event once the dialog was awaited)
@@ -27,7 +46,7 @@ function citationsCard() {
   return card("Citations in your library", `What each library paper cites, from OpenAlex reference lists: 'cites' links to the library papers it cites and lists the others by DOI (an OpenAlex id when there is none). Which papers cite a paper: its backlinks in Obsidian. Run it again after adding papers: DOIs of papers now in the library become links. Nothing is written until you confirm.`,
     h("div", { class: "row" }, h("span", { class: "small muted", style: "flex:1" }, `Library: ${libraryName()}. Uses about one OpenAlex request per 50 papers, and one per 100 cited works.`),
       btn([icon("link"), "Check citations"], async e => {
-        const r = await busy(e.currentTarget, () => api("library_citations", {}, { silent: true }));
+        const r = await stoppable(e.currentTarget, out, run => api("library_citations", run, { silent: true }));
         if (r) show(r, false);
       }, "")), out);
 }
@@ -57,16 +76,18 @@ PAGES.report = () => {
   const kept = S.records.filter(r => r.ft_decision === "include");
   const checklistHead = ["#", "Item", "Evidence in the vault", "Location in manuscript", "Reported"].map(t => h("th", {}, t));
   const part = PART.report ?? "paper";
+  const exportLine = h("span", { class: "small muted", role: "status" });
   if (part === "library") return h("div", {},
     kept.length ? card("Export to your Obsidian library", `When the review is finished, the papers you kept become publication notes in ${libraryName()}, with their PDFs; then the citations between your library papers are updated ('cites'). Everything else stays in this review's folder.`,
       h("div", { class: "row" }, h("span", { class: "small muted", style: "flex:1" },
         `${kept.length} included paper(s); ${kept.filter(r => r.publication).length} already linked to a library note. `,
         S.publication_template ? `New notes use your template “${S.publication_template}”` : "New notes use the app's own template (choose yours in Settings → Review settings)",
         ", plus 'added_by' (this review), 'added_on' (the date), 'citekey' and the OpenAlex id. A paper already in your library only gets this review in its 'included_in'."),
+        exportLine,
         btn([icon("library"), "Export to Obsidian library"], async e => {
           const button = e.currentTarget;
-          if (await confirmBox("Export to Obsidian library", `Export ${kept.length} included paper(s) to ${libraryName()} as publication notes, then update the citations between library papers (OpenAlex)? Do this when screening is final.`, "Export"))
-            busy(button, () => api("add_to_library"));
+          if (await confirmBox("Export to Obsidian library", `Export ${kept.length} included paper(s) to ${libraryName()} as publication notes, then update the citations between library papers (OpenAlex)? Do this when screening is final. Stop, while the citations run, keeps the exported notes.`, "Export"))
+            stoppable(button, exportLine, run => api("add_to_library", run));
         }, "primary"))) : null,
     S.library?.length ? citationsCard() : null,
     syncCard(),

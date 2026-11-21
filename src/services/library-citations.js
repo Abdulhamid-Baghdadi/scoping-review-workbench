@@ -27,24 +27,36 @@ export const libraryDois = library => new Map([...library.notes].map(([stem, p])
 /**
  * The OpenAlex works of the library's DOIs, and the DOIs of the works they cite. DOIs the filter syntax cannot
  * carry (":", ",", "|") are left out, as in Library Studio. When OpenAlex holds two works with one DOI, the first
- * keeps its id and gets the references of both. @returns {Promise<CitationData>}
+ * keeps its id and gets the references of both.
+ *
+ * A large library takes minutes, so the run goes request by request and `signal` stops it between two of them
+ * (design rule E3a, Bass et al. 2001): what the finished requests returned is kept, and `stopped` says how far it got
+ * (`done` of the `total` requests known by then). A partial answer is safe to plan from, since notes OpenAlex did not
+ * return keep their `cites`. @returns {Promise<CitationData & {stopped?: {done: number, total: number}}>}
  */
-export async function fetchLibraryWorks(library, openalex, onProgress = () => {}) {
+export async function fetchLibraryWorks(library, openalex, onProgress = () => {}, signal) {
   const dois = [...new Set([...libraryDois(library).values()].filter(d => d && !/[:,|]/.test(d)))];
   const works = new Map();
+  let done = 0, total = Math.ceil(dois.length / BATCH);
+  const stopped = () => (signal?.aborted ? { works, refDois: new Map(), stopped: { done, total } } : null);
   for (let i = 0; i < dois.length; i += BATCH) {
+    if (stopped()) return stopped();
     onProgress(`Asking OpenAlex for the library's papers (${i / BATCH + 1} of ${Math.ceil(dois.length / BATCH)})…`);
     for (const w of await allWorks(openalex, { filter: "doi:" + dois.slice(i, i + BATCH).join("|"), select: "id,doi,referenced_works" })) {
       const doi = normalizeDoi(w.doi), known = works.get(doi), referenced = w.referenced_works ?? [];
       works.set(doi, known ? { id: known.id, referenced: [...new Set([...known.referenced, ...referenced])] } : { id: w.id, referenced });
     }
+    done++;
   }
   const inLibrary = new Set([...works.values()].map(w => shortId(w.id)));
   const cited = [...new Set([...works.values()].flatMap(w => w.referenced.map(shortId)))].filter(id => /^W\d+$/.test(id) && !inLibrary.has(id));
   const refDois = new Map(cited.map(id => [id, ""]));
+  total += Math.ceil(cited.length / ID_BATCH);
   for (let i = 0; i < cited.length; i += ID_BATCH) {
+    if (signal?.aborted) return { works, refDois, stopped: { done, total } };   // cited works not asked yet stay listed by their OpenAlex id
     onProgress(`Asking OpenAlex for the DOIs of the cited works (${i / ID_BATCH + 1} of ${Math.ceil(cited.length / ID_BATCH)})…`);
     for (const w of await allWorks(openalex, { filter: "openalex:" + cited.slice(i, i + ID_BATCH).join("|"), select: "id,doi" })) refDois.set(shortId(w.id), normalizeDoi(w.doi));
+    done++;
   }
   return { works, refDois };
 }
