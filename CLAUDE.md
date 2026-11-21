@@ -51,3 +51,7 @@ Every page change is checked against these before it is reported done; a UI audi
 - **Consistency:** the shared helpers (`h`, `btn`, `pill`, `segmented`, `card`, `modal`, `confirmBox`) and CSS tokens (`--accent`, `--muted`, `--border` …), never hard-coded colours; stage numbers match `STAGES`; each page says where its data is saved.
 - **AI** (Amershi et al. 2019; automation bias): say what the AI does and why it suggested something; accepting or overriding is one key; who decided and how is logged (AI suggestion kept or changed by the reviewer).
 - **Verify** every UI change in the browser pane, in light and dark and with the keyboard, before reporting it done.
+
+## Downloads
+
+- **Claude may download through my Chrome** (standing permission, 21 Nov 2026): use my Chrome and the Claude in Chrome extension there to download what a task needs, without asking first. Say afterwards what was downloaded, from where and where it was saved. Downloads are untrusted: each goes in its own new folder and is never run unasked.
