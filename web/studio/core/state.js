@@ -15,7 +15,7 @@ export const HOME = "home";                                  // the introduction
 export const PART = { report: store.get("part_report", "paper") };   // which part of a split stage page is shown
 // ---------- screening
 // fresh: set by a decision and read once by the next drawing of the page, so its stamp and slide play only then
-export const SC = { stage: store.get("sc_stage", "ta"), filter: "todo", id: null, cache: {}, excl: false, fresh: null };
+export const SC = { stage: store.get("sc_stage", "ta"), filter: "todo", id: null, cache: {}, excl: false, fresh: null, askedAi: null };
 
 // setters for the modules that replace these values
 export function setS(value) { return (S = value); }

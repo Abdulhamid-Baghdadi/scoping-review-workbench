@@ -12,7 +12,7 @@ export const AI_STEPS = Object.freeze({
     name: "Title and abstract screening", skill: "review-screen-abstracts",
     modes: [
       ["off", "Off", "You screen every record yourself."],
-      ["suggest", "AI suggests", "The AI suggests a title/abstract decision per record. In the Suggested queue you read each record, then its suggestion under the abstract: Enter accepts it, I, U or E decides otherwise. Decisions are recorded as yours, noting whether you kept the suggestion."],
+      ["suggest", "AI suggests", "The AI suggests a title/abstract decision per record. In the Suggested queue you read each record, then press S to see its suggestion under the abstract: Enter accepts it, I, U or E decides otherwise. Decisions are recorded as yours, noting whether you kept the suggestion."],
     ],
     checks: ["Read each record before its suggestion.",
       "Decide yourself (I, U or E) wherever you disagree; Z undoes your last decision.",
@@ -23,7 +23,7 @@ export const AI_STEPS = Object.freeze({
     name: "Full-text screening", skill: "review-screen-fulltexts", stage: "screening",
     modes: [
       ["off", "Off", "You read every full text and decide yourself."],
-      ["suggest", "AI suggests", "The AI reads each attached full text and suggests a full-text decision with page numbers. In the Suggested queue you check each one: Enter accepts it, I or E decides otherwise."],
+      ["suggest", "AI suggests", "The AI reads each attached full text and suggests a full-text decision with page numbers. In the Suggested queue you read each one, then press S to see its suggestion: Enter accepts it, I or E decides otherwise."],
     ],
     checks: ["Open the PDF of every suggested exclusion you are unsure about, at the page given.",
       "Decide yourself (I or E) wherever you disagree; Z undoes your last decision.",
