@@ -58,11 +58,26 @@ The studio never imports `src/`: everything it knows about the review comes thro
 
 ## Design authority
 
-This file is the workbench's design authority. Its layering check follows the design rules ([UA-SMARTLab/design-rules](https://github.com/UA-SMARTLab/design-rules))
-at commit [`9fb580c`](https://github.com/UA-SMARTLab/design-rules/tree/9fb580c) (2026-11-01); since then the workbench changes its own rules here and never the shared ones. No
-departure from them is listed yet. Its architecture check is the design rules' example for ES modules, so that much
-has already gone back. A departure added later gets why, date and whether it is worth proposing back; the user
-decides.
+This file is the workbench's design authority. It follows the design rules ([UA-SMARTLab/design-rules](https://github.com/UA-SMARTLab/design-rules))
+at commit [`ca374d1`](https://github.com/UA-SMARTLab/design-rules/tree/ca374d1) (2026-11-21), moved on purpose from
+`9fb580c` (2026-11-01) on 2026-11-21; since then the workbench changes its own rules here and never the shared ones.
+Its architecture check is the design rules' example for ES modules, so that much has already gone back. A departure
+gets why, date and whether it is worth proposing back; the user decides.
+
+### Taken in on 2026-11-21: the five window rules of `7615f26`
+
+The commits since `9fb580c` change the layering contract only for Python, so the architecture check stands as it is.
+The five window rules of 19 Nov 2026 (`skill/ui-ux.md`) apply here as follows:
+
+| Rule | Here | Where it stands |
+|---|---|---|
+| H4a, the reviewer's own reading first where a check rests on the AI's value, Buçinca et al. (2021) | Screening (`web/studio/pages/screening.js`): Claude's suggestion is the AI's value a decision rests on | **Partly met.** In the "To screen" queue no suggestion is shown. In the "Suggested" queue the suggestion box sits under the abstract with nothing preselected and the log notes whether it was kept, but it is visible as soon as the record opens. **Open:** hold the box back until the reviewer asks for it or has read the record. |
+| E3a, stopping designed into runs over a minute, Bass et al. (2001) | Report: Check citations, its write, and Export to Obsidian library run OpenAlex requests for the whole library behind `busy()` | **Not met.** One request per 50 papers and per 100 cited works can pass a minute on a large library, with no Stop and no result kept per step. **Open:** run in steps, with Stop, saying which steps are kept. The AI skills run outside the window (`bin/ai-assist.js`), so this rule does not reach them. |
+| B4a, ranges as bars and whiskers | No range charts | Does not apply. |
+| B9, an estimate against the last version | No estimates with ranges | Does not apply. |
+| B10, a verdict only when the range excludes zero | No "better" or "lighter" comparisons | Does not apply. |
+
+No departure from the rules is listed: the two open items are work to do, not rules set aside.
 
 ```mermaid
 flowchart TD
@@ -71,7 +86,7 @@ flowchart TD
     CH["<b>architecture.json</b> and<br/>the project's own tests"]
     US(["The user, or a session<br/>on the user's word"])
 
-    DR -- "1. taken once, at commit 9fb580c" --> AR
+    DR -- "1. taken once, at commit 9fb580c;<br/>moved to ca374d1 on 2026-11-21" --> AR
     US -- "2. a rule added, changed or dropped:<br/>edited here, never upstream" --> AR
     AR -- "3. held by" --> CH
     AR -. "4. proposed back;<br/>the user decides" .-> DR
@@ -103,4 +118,4 @@ Every engine module gets unit tests for its rules. The smoke test opens the fini
 
 The README's pictures (`docs/readme/`) are made from the program itself by `scripts/readme-screenshot.js`, with made-up papers in a fresh headless Chromium: the screening animation (a GIF from Playwright's video, through ffmpeg, under 5 s and played once) and the screening page, the Homepage and the tour as stills, light and dark. Make them again when the look changes; `tests/unit/readme.test.js` checks that every picture the README shows is there, has alt text, and that the animation stops by itself within 5 s.
 
-The architecture check holds the layers above, written in `architecture.json`, to the layering contract of the design rules ([UA-SMARTLab/design-rules, `skill/architecture.md`](https://github.com/UA-SMARTLab/design-rules/blob/9fb580c/skill/architecture.md)). It reads every `import`, `export … from` and `import()`, and fails on an import of a layer above or of one a layer may not use, a cycle, a package a layer must keep out, a module in no layer, or an import of a file that is not there. It needs only Node, so the site's workflow runs it before publishing. The design rules' audit tool reads the same file, gives the same findings, and draws the dependency matrix, every module against every other: `python ~/.claude/skills/web-app-design/scripts/check_layers.py . --page build/dependencies.html`.
+The architecture check holds the layers above, written in `architecture.json`, to the layering contract of the design rules ([UA-SMARTLab/design-rules, `skill/architecture.md`](https://github.com/UA-SMARTLab/design-rules/blob/ca374d1/skill/architecture.md)). It reads every `import`, `export … from` and `import()`, and fails on an import of a layer above or of one a layer may not use, a cycle, a package a layer must keep out, a module in no layer, or an import of a file that is not there. It needs only Node, so the site's workflow runs it before publishing. The design rules' audit tool reads the same file, gives the same findings, and draws the dependency matrix, every module against every other: `python ~/.claude/skills/web-app-design/scripts/check_layers.py . --page build/dependencies.html`.
